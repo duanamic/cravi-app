@@ -3,12 +3,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-const imgFrame = "https://www.figma.com/api/mcp/asset/a8591f12-e859-4d44-99d0-65021b3bb317"
-const imgPlus = "https://www.figma.com/api/mcp/asset/16457eaf-fa07-4b3e-acb9-0f2b16af7a02"
-const imgUser = "https://www.figma.com/api/mcp/asset/64ee6b85-b995-4fc6-a296-159390fd3e35"
-const imgBack = "https://www.figma.com/api/mcp/asset/7be56e1f-99f2-4446-b913-c599eb9177b4"
-const imgVector = "https://www.figma.com/api/mcp/asset/2b5f6d43-79d0-420d-bb9a-a11325ad5416"
-const imgSignOut = "https://www.figma.com/api/mcp/asset/0bbe1965-5268-4dfb-b388-a8ade2fec1f3"
+const imgFrame = "https://www.figma.com/api/mcp/asset/317c8a93-9083-46a3-862c-334d324937d5"
+const imgPlus = "https://www.figma.com/api/mcp/asset/4d79a58b-bbc7-4a0d-94dd-ee6ba5b5f3e5"
+const imgUser = "https://www.figma.com/api/mcp/asset/a0af743b-45ea-4c73-8088-d9ae91a4f892"
+const imgBack = "https://www.figma.com/api/mcp/asset/2bccc7ec-e74d-4c66-942a-050d6ced06f7"
+const imgVector = "https://www.figma.com/api/mcp/asset/cf669a8d-2330-438c-ae1f-33b60440cabc"
+const imgSignOut = "https://www.figma.com/api/mcp/asset/f292426f-69d5-4c35-bc79-26fda71e3e0c"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -48,7 +48,7 @@ export default function ProfilePage() {
             </div>
             <div className="flex flex-col items-center gap-1.5">
               <p className="font-playfair font-bold text-[#3b6370] text-[40px] leading-none">0</p>
-              <p className="font-inter text-[#5c6365] text-[12px]">Recipes imported</p>
+              <p className="font-inter text-[#5c6365] text-[12px]">Recipes</p>
             </div>
           </div>
         </div>
@@ -58,7 +58,7 @@ export default function ProfilePage() {
             className="w-full h-12 border border-[#3b6370] rounded-xl flex items-center justify-center gap-2 hover:bg-[#3b6370]/5 transition-colors"
           >
             <img src={imgSignOut} alt="Sign out" className="w-4 h-4" />
-            <span className="font-inter font-medium text-[#1e2b24] text-[14px]">Sign Out</span>
+            <span className="font-inter font-medium text-[#3b6370] text-[14px]">Sign Out</span>
           </button>
           <p className="font-inter text-[#5c6365] text-[11px]">Cravi v1.0</p>
         </div>
