@@ -111,7 +111,7 @@ function RecipeCard({ recipe }: { recipe: any }) {
         <div className="p-3 flex flex-col gap-2">
           <p className="font-playfair font-semibold text-[#1a1a1a] text-base leading-tight">{recipe.title}</p>
           <div className="flex items-center gap-1.5">
-            {firstTag && <span className="bg-[#f5edd8] text-[#1c3b2a] text-[10px] font-inter font-medium px-2 py-[3px] rounded-[10px]">{firstTag}</span>}
+            {firstTag && <span className="bg-[#3b6370] text-white text-[10px] font-inter font-medium px-2 py-[3px] rounded-[10px]">{firstTag}</span>}
             {recipe.prep_time && <span className="font-inter text-[#6b6560] text-[11px]">{recipe.prep_time}</span>}
           </div>
         </div>

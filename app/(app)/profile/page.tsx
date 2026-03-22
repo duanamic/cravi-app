@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -13,6 +14,20 @@ const imgSignOut = "https://www.figma.com/api/mcp/asset/f292426f-69d5-4c35-bc79-
 export default function ProfilePage() {
   const router = useRouter()
   const supabase = createClient()
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    const fetchCount = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { count: total } = await supabase
+        .from('recipes')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+      setCount(total || 0)
+    }
+    fetchCount()
+  }, [])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -47,7 +62,7 @@ export default function ProfilePage() {
               <div className="h-px bg-[#d6dee8] w-full" />
             </div>
             <div className="flex flex-col items-center gap-1.5">
-              <p className="font-playfair font-bold text-[#3b6370] text-[40px] leading-none">0</p>
+              <p className="font-playfair font-bold text-[#3b6370] text-[40px] leading-none">{count}</p>
               <p className="font-inter text-[#5c6365] text-[12px]">Recipes</p>
             </div>
           </div>
