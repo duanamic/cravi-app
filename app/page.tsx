@@ -1,6 +1,6 @@
 'use client'
 export const dynamic = 'force-dynamic'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -10,6 +10,15 @@ const imgEye = "https://www.figma.com/api/mcp/asset/4cf1cb22-f396-4a65-b6a3-fd5d
 export default function AuthPage() {
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) router.push('/home')
+    }
+    checkSession()
+  }, [])
+
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
