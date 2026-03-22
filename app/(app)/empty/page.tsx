@@ -20,8 +20,7 @@ export default function EmptyStatePage() {
         </div>
       </div>
       <div className="px-5 py-6">
-        <p className="font-playfair font-bold text-[#1b1b1b] text-[28px] leading-tight">Good evening, Wike.</p>
-        <p className="font-playfair font-bold text-[#6c8992] text-[28px] leading-tight">What are you craving?</p>
+        <p className="font-playfair font-bold text-[#1b1b1b] text-[28px] leading-tight">What are you craving?</p>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center px-11 gap-6">
         <div className="flex flex-col items-center gap-4">

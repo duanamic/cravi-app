@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 const imgFrame = "https://www.figma.com/api/mcp/asset/aeebbe46-37b1-4a3c-a82b-8798db9ebb1e"
 const imgPlus = "https://www.figma.com/api/mcp/asset/148c5e63-dadf-4d16-b17d-4c82bf443727"
 const imgUser = "https://www.figma.com/api/mcp/asset/8bc6031a-890d-40dd-8c68-6444e046ef8f"
@@ -22,8 +23,27 @@ export default function HomePage() {
   const router = useRouter()
   const [active, setActive] = useState('Italian')
   const [showModal, setShowModal] = useState(false)
-  const [hasRecipes] = useState(false) // TODO: replace with real Supabase check
-  useEffect(() => { if (!hasRecipes) { /* stay on home for now, empty state handles itself */ } }, [hasRecipes])
+  const [hasRecipes, setHasRecipes] = useState<boolean | null>(null)
+  const supabase = createClient()
+
+  useEffect(() => {
+    const checkRecipes = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/'); return }
+      const { count } = await supabase
+        .from('recipes')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+      if ((count ?? 0) === 0) {
+        router.push('/empty')
+      } else {
+        setHasRecipes(true)
+      }
+    }
+    checkRecipes()
+  }, [])
+
+  if (hasRecipes === null) return null
   const col1 = recipes.filter((_,i) => i%2===0)
   const col2 = recipes.filter((_,i) => i%2===1)
   return (
@@ -40,8 +60,7 @@ export default function HomePage() {
       </div>
       <div className="flex flex-col gap-6 px-5 py-6 flex-1">
         <div>
-          <p className="font-playfair font-bold text-[#1b1b1b] text-[28px] leading-tight">Good evening, Wike.</p>
-          <p className="font-playfair font-bold text-[#6c8992] text-[28px] leading-tight">What are you craving?</p>
+          <p className="font-playfair font-bold text-[#1b1b1b] text-[28px] leading-tight">What are you craving?</p>
         </div>
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-5 px-5">
           {chips.map(c => (
