@@ -41,6 +41,64 @@ export default function EmptyStatePage() {
 }
 function AddRecipeModal({ onClose }: { onClose: () => void }) {
   const [url, setUrl] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState<any>(null)
+  const [error, setError] = useState('')
+
+  const handleAdd = async () => {
+    if (!url.trim()) return
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/parse-recipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setResult(data.recipe)
+      } else {
+        setError('Could not parse this URL. Please try another.')
+      }
+    } catch {
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (result) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-50">
+        <div className="bg-white rounded-2xl w-full max-w-sm p-6 flex flex-col gap-4 max-h-[80vh] overflow-y-auto">
+          <div className="flex items-center justify-between">
+            <h3 className="font-playfair font-bold text-[#1a1a1a] text-xl">Recipe found!</h3>
+            <button onClick={onClose} className="text-[#5c6365] text-xl font-light">×</button>
+          </div>
+          <h4 className="font-playfair font-bold text-[#1a1a1a] text-lg">{result.title}</h4>
+          <p className="font-inter text-[#5c6365] text-sm">{result.source_handle} · {result.prep_time}</p>
+          <div className="flex flex-wrap gap-2">
+            {Object.values(result.tags || {}).map((tag: any, i) => (
+              <span key={i} className="bg-[#dde4e6] text-[#1e2b24] font-inter font-medium text-xs px-3 py-1 rounded-full">{tag}</span>
+            ))}
+          </div>
+          <div className="h-px bg-[#dde4e6]" />
+          <p className="font-inter font-semibold text-[#5c6365] text-[11px] tracking-widest">INGREDIENTS</p>
+          {(result.ingredients || []).map((ing: string, i: number) => (
+            <div key={i} className="flex items-center gap-2">
+              <div className="w-2 h-[2px] bg-[#1a1a1a] flex-shrink-0" />
+              <p className="font-inter text-[#1a1a1a] text-sm">{ing}</p>
+            </div>
+          ))}
+          <button onClick={onClose} className="w-full h-[50px] bg-[#3b6370] rounded-xl font-inter font-semibold text-white text-[15px] hover:opacity-90 transition-opacity">
+            Save to collection
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-50">
       <div className="bg-white rounded-2xl w-full max-w-sm p-6 flex flex-col gap-5">
@@ -51,10 +109,22 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
         <p className="font-inter text-[#5c6365] text-sm leading-relaxed">Paste a recipe URL from Instagram and we will automatically import it into your collection.</p>
         <div className="flex flex-col gap-2">
           <label className="font-inter font-semibold text-[#1a1a1a] text-[13px]">Instagram Recipe URL</label>
-          <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://www.instagram.com/reels/..." className="w-full h-[47px] border border-[#dce8eb] rounded-lg px-4 font-inter text-[13px] text-[#1a1a1a] placeholder-[#a0b4bc] outline-none focus:border-[#3b6370]" />
+          <input
+            value={url}
+            onChange={e => setUrl(e.target.value)}
+            placeholder="https://www.instagram.com/reels/..."
+            className="w-full h-[47px] border border-[#dce8eb] rounded-lg px-4 font-inter text-[13px] text-[#1a1a1a] placeholder-[#a0b4bc] outline-none focus:border-[#3b6370]"
+          />
+          {error && <p className="font-inter text-red-500 text-xs">{error}</p>}
         </div>
-        <button className="w-full h-[50px] bg-[#3b6370] rounded-xl flex items-center justify-center gap-2">
-          <span className="font-inter font-semibold text-white text-[15px]">+ Add to your collection</span>
+        <button
+          onClick={handleAdd}
+          disabled={loading || !url.trim()}
+          className="w-full h-[50px] bg-[#3b6370] rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+        >
+          <span className="font-inter font-semibold text-white text-[15px]">
+            {loading ? 'Analyzing recipe...' : '+ Add to your collection'}
+          </span>
         </button>
       </div>
     </div>
