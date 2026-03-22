@@ -42,6 +42,8 @@ export default function EmptyStatePage() {
     </div>
   )
 }
+const imgCloseIcon = "https://www.figma.com/api/mcp/asset/36af6e40-bd8d-4432-9848-eddac4bd87da"
+
 function AddRecipeModal({ onClose }: { onClose: () => void }) {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
@@ -77,52 +79,77 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/'); return }
-      await supabase.from('recipes').insert({
+      const { error: insertError } = await supabase.from('recipes').insert({
         user_id: user.id,
         title: result.title,
         source_url: url,
-        source_handle: result.source_handle,
-        platform: result.platform,
-        prep_time: result.prep_time,
-        difficulty: result.difficulty,
-        ingredients: result.ingredients,
-        steps: result.steps,
-        tags: result.tags,
+        source_handle: result.source_handle || '',
+        platform: result.platform || 'instagram',
+        prep_time: result.prep_time || '',
+        difficulty: result.difficulty || '',
+        ingredients: result.ingredients || [],
+        steps: result.steps || [],
+        tags: result.tags || {},
       })
+      if (insertError) throw insertError
       router.push('/home')
-    } catch (err) {
-      setError('Failed to save recipe. Please try again.')
+    } catch (err: any) {
+      console.error('Save error:', err)
+      setError('Failed to save: ' + (err?.message || 'Unknown error'))
       setSaving(false)
     }
   }
 
   if (result) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-50">
-        <div className="bg-white rounded-2xl w-full max-w-sm p-6 flex flex-col gap-4 max-h-[80vh] overflow-y-auto">
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center px-6 z-50">
+        <div className="bg-[#fbfeff] rounded-[20px] w-full max-w-sm px-6 py-7 flex flex-col gap-6 shadow-[0px_8px_40px_0px_rgba(0,0,0,0.2)]">
+          {/* Header */}
           <div className="flex items-center justify-between">
-            <h3 className="font-playfair font-bold text-[#1a1a1a] text-xl">Recipe found!</h3>
-            <button onClick={onClose} className="w-9 h-9 flex items-center justify-center text-[#5c6365] text-xl font-light">×</button>
+            <p className="font-inter font-semibold text-[#5c6365] text-[14px] uppercase tracking-wide">Recipe found</p>
+            <button onClick={onClose} className="w-8 h-8 bg-[#dde4e6] rounded-full flex items-center justify-center flex-shrink-0">
+              <img src={imgCloseIcon} alt="Close" className="w-4 h-4" />
+            </button>
           </div>
-          <h4 className="font-playfair font-bold text-[#1a1a1a] text-lg">{result.title}</h4>
-          <p className="font-inter text-[#5c6365] text-sm">{result.source_handle} · {result.prep_time}</p>
-          <div className="flex flex-wrap gap-2">
-            {Object.values(result.tags || {}).map((tag: any, i) => (
-              <span key={i} className="bg-[#dde4e6] text-[#1e2b24] font-inter font-medium text-xs px-3 py-[6px] rounded-full">{tag}</span>
-            ))}
-          </div>
-          <div className="h-px bg-[#dde4e6]" />
-          <p className="font-inter font-semibold text-[#5c6365] text-[11px] tracking-widest">INGREDIENTS</p>
-          {(result.ingredients || []).map((ing: string, i: number) => (
-            <div key={i} className="flex items-center gap-2">
-              <div className="w-2 h-[2px] bg-[#1a1a1a] flex-shrink-0" />
-              <p className="font-inter text-[#1a1a1a] text-sm">{ing}</p>
+
+          {/* Recipe title */}
+          <p className="font-playfair font-bold text-[#1a1a1a] text-[20px] leading-snug">{result.title}</p>
+
+          {/* Scrollable content area — fixed height */}
+          <div className="h-[260px] overflow-y-auto flex flex-col gap-5 pr-1">
+            {/* Source + time */}
+            <p className="font-inter text-[#5c6365] text-[12px]">
+              {result.source_handle} • {result.prep_time}
+            </p>
+
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2">
+              {Object.values(result.tags || {}).map((tag: any, i) => (
+                <span key={i} className="bg-[#dde4e6] text-[#1e2b24] font-inter font-medium text-[10px] px-[14px] py-[6px] rounded-full">{tag}</span>
+              ))}
             </div>
-          ))}
+
+            {/* Divider */}
+            <div className="h-px bg-[#dde4e6] w-full flex-shrink-0" />
+
+            {/* Ingredients */}
+            <div className="flex flex-col gap-[14px]">
+              <p className="font-inter font-semibold text-[#5c6365] text-[11px] tracking-[1.5px]">INGREDIENTS</p>
+              {(result.ingredients || []).map((ing: string, i: number) => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className="w-2 h-[2px] bg-[#1a1a1a] flex-shrink-0" />
+                  <p className="font-inter text-[#1a1a1a] text-[13px]">{ing}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Save button — always visible */}
+          {error && <p className="font-inter text-red-500 text-xs -mt-2">{error}</p>}
           <button
             onClick={handleSave}
             disabled={saving}
-            className="w-full h-[52px] bg-[#3b6370] rounded-full font-inter font-semibold text-white text-[15px] hover:opacity-90 transition-opacity disabled:opacity-50 mt-2"
+            className="w-full h-[52px] bg-[#3b6370] rounded-full font-inter font-semibold text-white text-[15px] hover:opacity-90 transition-opacity disabled:opacity-50 flex-shrink-0"
           >
             {saving ? 'Saving...' : 'Save to collection'}
           </button>
@@ -132,11 +159,13 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-50">
-      <div className="bg-white rounded-2xl w-full max-w-sm p-6 flex flex-col gap-5">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center px-6 z-50">
+      <div className="bg-[#fbfeff] rounded-[20px] w-full max-w-sm px-6 py-7 flex flex-col gap-6 shadow-[0px_8px_40px_0px_rgba(0,0,0,0.2)]">
         <div className="flex items-center justify-between">
           <h3 className="font-playfair font-bold text-[#1a1a1a] text-xl">Add Recipe</h3>
-          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center text-[#5c6365] text-xl font-light">×</button>
+          <button onClick={onClose} className="w-9 h-9 bg-[#dde4e6] rounded-full flex items-center justify-center">
+            <img src={imgCloseIcon} alt="Close" className="w-4 h-4" />
+          </button>
         </div>
         <p className="font-inter text-[#5c6365] text-sm leading-relaxed">Paste a recipe URL from Instagram and we will automatically import it into your collection.</p>
         <div className="flex flex-col gap-2">
