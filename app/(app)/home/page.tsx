@@ -49,13 +49,13 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#f4fbfd] flex flex-col">
       <div className="flex items-center justify-between px-5 py-[14px] border-b border-[#d6dee8]">
-        <div className="flex items-center gap-2">
+        <Link href="/home" className="flex items-center gap-2">
           <img src={imgFrame} alt="Cravi" className="w-7 h-7" />
           <span className="font-playfair font-bold text-[#3b6370] text-[19px]">Cravi</span>
-        </div>
+        </Link>
         <div className="flex items-center gap-4">
-          <button onClick={() => setShowModal(true)}><img src={imgPlus} alt="Add" className="w-5 h-5" /></button>
-          <Link href="/profile"><img src={imgUser} alt="Profile" className="w-5 h-5" /></Link>
+          <button onClick={() => setShowModal(true)} className="w-9 h-9 flex items-center justify-center"><img src={imgPlus} alt="Add" className="w-5 h-5" /></button>
+          <Link href="/profile" className="w-9 h-9 flex items-center justify-center"><img src={imgUser} alt="Profile" className="w-5 h-5" /></Link>
         </div>
       </div>
       <div className="flex flex-col gap-6 px-5 py-6 flex-1">
@@ -108,8 +108,10 @@ function RecipeCard({ recipe }: { recipe: any }) {
 function AddRecipeModal({ onClose }: { onClose: () => void }) {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState('')
+  const supabase = createClient()
 
   const handleAdd = async () => {
     if (!url.trim()) return
@@ -122,15 +124,37 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
         body: JSON.stringify({ url }),
       })
       const data = await res.json()
-      if (data.success) {
-        setResult(data.recipe)
-      } else {
-        setError('Could not parse this URL. Please try another.')
-      }
+      if (data.success) setResult(data.recipe)
+      else setError('Could not parse this URL. Please try another.')
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSave = async () => {
+    if (!result) return
+    setSaving(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { return }
+      await supabase.from('recipes').insert({
+        user_id: user.id,
+        title: result.title,
+        source_url: url,
+        source_handle: result.source_handle,
+        platform: result.platform,
+        prep_time: result.prep_time,
+        difficulty: result.difficulty,
+        ingredients: result.ingredients,
+        steps: result.steps,
+        tags: result.tags,
+      })
+      onClose()
+    } catch (err) {
+      setError('Failed to save recipe. Please try again.')
+      setSaving(false)
     }
   }
 
@@ -140,27 +164,29 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
         <div className="bg-white rounded-2xl w-full max-w-sm p-6 flex flex-col gap-4 max-h-[80vh] overflow-y-auto">
           <div className="flex items-center justify-between">
             <h3 className="font-playfair font-bold text-[#1a1a1a] text-xl">Recipe found!</h3>
-            <button onClick={onClose} className="text-[#5c6365] text-xl font-light">×</button>
+            <button onClick={onClose} className="w-9 h-9 flex items-center justify-center text-[#5c6365] text-xl font-light">×</button>
           </div>
-          <div className="flex flex-col gap-3">
-            <h4 className="font-playfair font-bold text-[#1a1a1a] text-lg">{result.title}</h4>
-            <p className="font-inter text-[#5c6365] text-sm">{result.source_handle} · {result.prep_time}</p>
-            <div className="flex flex-wrap gap-2">
-              {Object.values(result.tags || {}).map((tag: any, i) => (
-                <span key={i} className="bg-[#dde4e6] text-[#1e2b24] font-inter font-medium text-xs px-3 py-1 rounded-full">{tag}</span>
-              ))}
-            </div>
-            <div className="h-px bg-[#dde4e6]" />
-            <p className="font-inter font-semibold text-[#5c6365] text-[11px] tracking-widest">INGREDIENTS</p>
-            {(result.ingredients || []).map((ing: string, i: number) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="w-2 h-[2px] bg-[#1a1a1a] flex-shrink-0" />
-                <p className="font-inter text-[#1a1a1a] text-sm">{ing}</p>
-              </div>
+          <h4 className="font-playfair font-bold text-[#1a1a1a] text-lg">{result.title}</h4>
+          <p className="font-inter text-[#5c6365] text-sm">{result.source_handle} · {result.prep_time}</p>
+          <div className="flex flex-wrap gap-2">
+            {Object.values(result.tags || {}).map((tag: any, i) => (
+              <span key={i} className="bg-[#dde4e6] text-[#1e2b24] font-inter font-medium text-xs px-3 py-[6px] rounded-full">{tag}</span>
             ))}
           </div>
-          <button onClick={onClose} className="w-full h-[50px] bg-[#3b6370] rounded-xl font-inter font-semibold text-white text-[15px] hover:opacity-90 transition-opacity">
-            Save to collection
+          <div className="h-px bg-[#dde4e6]" />
+          <p className="font-inter font-semibold text-[#5c6365] text-[11px] tracking-widest">INGREDIENTS</p>
+          {(result.ingredients || []).map((ing: string, i: number) => (
+            <div key={i} className="flex items-center gap-2">
+              <div className="w-2 h-[2px] bg-[#1a1a1a] flex-shrink-0" />
+              <p className="font-inter text-[#1a1a1a] text-sm">{ing}</p>
+            </div>
+          ))}
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full h-[52px] bg-[#3b6370] rounded-full font-inter font-semibold text-white text-[15px] hover:opacity-90 transition-opacity disabled:opacity-50 mt-2"
+          >
+            {saving ? 'Saving...' : 'Save to collection'}
           </button>
         </div>
       </div>
@@ -172,7 +198,7 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
       <div className="bg-white rounded-2xl w-full max-w-sm p-6 flex flex-col gap-5">
         <div className="flex items-center justify-between">
           <h3 className="font-playfair font-bold text-[#1a1a1a] text-xl">Add Recipe</h3>
-          <button onClick={onClose} className="text-[#5c6365] text-xl font-light">×</button>
+          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center text-[#5c6365] text-xl font-light">×</button>
         </div>
         <p className="font-inter text-[#5c6365] text-sm leading-relaxed">Paste a recipe URL from Instagram and we will automatically import it into your collection.</p>
         <div className="flex flex-col gap-2">
@@ -183,17 +209,14 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
             placeholder="https://www.instagram.com/reels/..."
             className="w-full h-[47px] border border-[#dce8eb] rounded-lg px-4 font-inter text-[13px] text-[#1a1a1a] placeholder-[#a0b4bc] outline-none focus:border-[#3b6370]"
           />
-          {url && !error && <p className="font-inter text-[#3b6370] text-xs">URL detected — ready to import</p>}
           {error && <p className="font-inter text-red-500 text-xs">{error}</p>}
         </div>
         <button
           onClick={handleAdd}
           disabled={loading || !url.trim()}
-          className="w-full h-[50px] bg-[#3b6370] rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+          className="w-full h-[52px] bg-[#3b6370] rounded-full font-inter font-semibold text-white text-[15px] hover:opacity-90 transition-opacity disabled:opacity-50"
         >
-          <span className="font-inter font-semibold text-white text-[15px]">
-            {loading ? 'Analyzing recipe...' : '+ Add to your collection'}
-          </span>
+          {loading ? 'Analyzing recipe...' : '+ Add to your collection'}
         </button>
       </div>
     </div>

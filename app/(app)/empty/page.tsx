@@ -1,5 +1,8 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 const imgFrame = "https://www.figma.com/api/mcp/asset/dd15a95d-7314-460a-a34d-cd7d43ed81ef"
 const imgPlus = "https://www.figma.com/api/mcp/asset/2bce3ddc-268f-4002-aef3-fd70a582ffd3"
 const imgUser = "https://www.figma.com/api/mcp/asset/a466d05c-608f-4a27-91c9-97eb9a8d87e6"
@@ -10,13 +13,13 @@ export default function EmptyStatePage() {
   return (
     <div className="min-h-screen bg-[#f4fbfd] flex flex-col">
       <div className="flex items-center justify-between px-5 py-[14px] border-b border-[#d6dee8]">
-        <div className="flex items-center gap-2">
+        <Link href="/home" className="flex items-center gap-2">
           <img src={imgFrame} alt="Cravi" className="w-7 h-7" />
           <span className="font-playfair font-bold text-[#3b6370] text-[19px]">Cravi</span>
-        </div>
+        </Link>
         <div className="flex items-center gap-4">
-          <button onClick={() => setShowModal(true)}><img src={imgPlus} alt="Add" className="w-5 h-5" /></button>
-          <img src={imgUser} alt="Profile" className="w-5 h-5" />
+          <button onClick={() => setShowModal(true)} className="w-9 h-9 flex items-center justify-center"><img src={imgPlus} alt="Add" className="w-5 h-5" /></button>
+          <Link href="/profile" className="w-9 h-9 flex items-center justify-center"><img src={imgUser} alt="Profile" className="w-5 h-5" /></Link>
         </div>
       </div>
       <div className="px-5 py-6">
@@ -42,8 +45,11 @@ export default function EmptyStatePage() {
 function AddRecipeModal({ onClose }: { onClose: () => void }) {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState('')
+  const router = useRouter()
+  const supabase = createClient()
 
   const handleAdd = async () => {
     if (!url.trim()) return
@@ -56,15 +62,37 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
         body: JSON.stringify({ url }),
       })
       const data = await res.json()
-      if (data.success) {
-        setResult(data.recipe)
-      } else {
-        setError('Could not parse this URL. Please try another.')
-      }
+      if (data.success) setResult(data.recipe)
+      else setError('Could not parse this URL. Please try another.')
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSave = async () => {
+    if (!result) return
+    setSaving(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/'); return }
+      await supabase.from('recipes').insert({
+        user_id: user.id,
+        title: result.title,
+        source_url: url,
+        source_handle: result.source_handle,
+        platform: result.platform,
+        prep_time: result.prep_time,
+        difficulty: result.difficulty,
+        ingredients: result.ingredients,
+        steps: result.steps,
+        tags: result.tags,
+      })
+      router.push('/home')
+    } catch (err) {
+      setError('Failed to save recipe. Please try again.')
+      setSaving(false)
     }
   }
 
@@ -74,13 +102,13 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
         <div className="bg-white rounded-2xl w-full max-w-sm p-6 flex flex-col gap-4 max-h-[80vh] overflow-y-auto">
           <div className="flex items-center justify-between">
             <h3 className="font-playfair font-bold text-[#1a1a1a] text-xl">Recipe found!</h3>
-            <button onClick={onClose} className="text-[#5c6365] text-xl font-light">×</button>
+            <button onClick={onClose} className="w-9 h-9 flex items-center justify-center text-[#5c6365] text-xl font-light">×</button>
           </div>
           <h4 className="font-playfair font-bold text-[#1a1a1a] text-lg">{result.title}</h4>
           <p className="font-inter text-[#5c6365] text-sm">{result.source_handle} · {result.prep_time}</p>
           <div className="flex flex-wrap gap-2">
             {Object.values(result.tags || {}).map((tag: any, i) => (
-              <span key={i} className="bg-[#dde4e6] text-[#1e2b24] font-inter font-medium text-xs px-3 py-1 rounded-full">{tag}</span>
+              <span key={i} className="bg-[#dde4e6] text-[#1e2b24] font-inter font-medium text-xs px-3 py-[6px] rounded-full">{tag}</span>
             ))}
           </div>
           <div className="h-px bg-[#dde4e6]" />
@@ -91,8 +119,12 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
               <p className="font-inter text-[#1a1a1a] text-sm">{ing}</p>
             </div>
           ))}
-          <button onClick={onClose} className="w-full h-[50px] bg-[#3b6370] rounded-xl font-inter font-semibold text-white text-[15px] hover:opacity-90 transition-opacity">
-            Save to collection
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full h-[52px] bg-[#3b6370] rounded-full font-inter font-semibold text-white text-[15px] hover:opacity-90 transition-opacity disabled:opacity-50 mt-2"
+          >
+            {saving ? 'Saving...' : 'Save to collection'}
           </button>
         </div>
       </div>
@@ -104,7 +136,7 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
       <div className="bg-white rounded-2xl w-full max-w-sm p-6 flex flex-col gap-5">
         <div className="flex items-center justify-between">
           <h3 className="font-playfair font-bold text-[#1a1a1a] text-xl">Add Recipe</h3>
-          <button onClick={onClose} className="text-[#5c6365] text-xl font-light">×</button>
+          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center text-[#5c6365] text-xl font-light">×</button>
         </div>
         <p className="font-inter text-[#5c6365] text-sm leading-relaxed">Paste a recipe URL from Instagram and we will automatically import it into your collection.</p>
         <div className="flex flex-col gap-2">
@@ -120,11 +152,9 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
         <button
           onClick={handleAdd}
           disabled={loading || !url.trim()}
-          className="w-full h-[50px] bg-[#3b6370] rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+          className="w-full h-[52px] bg-[#3b6370] rounded-full font-inter font-semibold text-white text-[15px] hover:opacity-90 transition-opacity disabled:opacity-50"
         >
-          <span className="font-inter font-semibold text-white text-[15px]">
-            {loading ? 'Analyzing recipe...' : '+ Add to your collection'}
-          </span>
+          {loading ? 'Analyzing recipe...' : '+ Add to your collection'}
         </button>
       </div>
     </div>

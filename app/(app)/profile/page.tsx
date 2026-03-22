@@ -22,10 +22,10 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#f4fbfd] flex flex-col">
       <div className="flex items-center justify-between px-5 py-[14px] border-b border-[#d6dee8]">
-        <div className="flex items-center gap-2">
+        <Link href="/home" className="flex items-center gap-2">
           <img src={imgFrame} alt="Cravi" className="w-7 h-7" />
           <span className="font-playfair font-bold text-[#3b6370] text-[19px]">Cravi</span>
-        </div>
+        </Link>
         <div className="flex items-center gap-4">
           <img src={imgPlus} alt="Add" className="w-5 h-5" />
           <img src={imgUser} alt="Profile" className="w-5 h-5" />
