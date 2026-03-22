@@ -1,4 +1,6 @@
 'use client'
+export const dynamic = 'force-dynamic'
+
 import { useState } from 'react'
 import Link from 'next/link'
 const imgFrame = "https://www.figma.com/api/mcp/asset/aeebbe46-37b1-4a3c-a82b-8798db9ebb1e"

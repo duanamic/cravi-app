@@ -1,4 +1,6 @@
 'use client'
+export const dynamic = 'force-dynamic'
+
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 const imgFrame = "https://www.figma.com/api/mcp/asset/7a367840-6d98-4b98-b6c5-36eb864bc41a"
