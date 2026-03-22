@@ -59,6 +59,8 @@ const config: Config = {
       fontFamily: {
         display: ["Playfair Display", "serif"],
         body: ["Inter", "sans-serif"],
+        playfair: ["var(--font-playfair)", "serif"],
+        inter: ["var(--font-inter)", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

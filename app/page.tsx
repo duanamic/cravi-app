@@ -1,101 +1,116 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState } from 'react'
+import Image from 'next/image'
+
+export default function WelcomePage() {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleInstagramConnect = async () => {
+    setIsLoading(true)
+    // Instagram OAuth will be wired up next
+    console.log('Connecting with Instagram...')
+    setIsLoading(false)
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen bg-[#f4fbfd] flex flex-col items-center justify-center px-6 py-12">
+      <div className="w-full max-w-sm flex flex-col gap-10 items-center">
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+        {/* Logo + Welcome Copy */}
+        <div className="flex flex-col gap-6 items-center text-center w-full">
+          <div className="w-[120px] h-[120px] rounded-full overflow-hidden">
+            <img
+              src="https://www.figma.com/api/mcp/asset/878e413a-6303-46e2-b0e2-041af69b17ec"
+              alt="Cravi logo"
+              className="w-full h-full object-cover"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
+          <div className="flex flex-col gap-4 items-center">
+            <h1 className="font-playfair font-bold text-[#1a1a1a] text-2xl">
+              Welcome to Cravi!
+            </h1>
+            <p className="font-inter text-[#5c6365] text-base leading-relaxed">
+              Create your profile to save recipes, share your creations, and connect with fellow food lovers.
+            </p>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Form */}
+        <div className="flex flex-col gap-10 w-full">
+          <div className="flex flex-col gap-4 w-full">
+            {/* Username */}
+            <div className="flex flex-col gap-2">
+              <label className="font-inter font-semibold text-[#1a1a1a] text-[13px]">
+                Username
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="@username"
+                className="w-full h-[50px] bg-white border border-[#dce8eb] rounded-lg px-4 text-[15px] text-[#1a1a1a] placeholder-[#a0b4bc] font-inter outline-none focus:border-[#1e2b24] transition-colors"
+              />
+            </div>
+
+            {/* Password */}
+            <div className="flex flex-col gap-2">
+              <label className="font-inter font-semibold text-[#1a1a1a] text-[13px]">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full h-[50px] bg-white border border-[#dce8eb] rounded-lg px-4 pr-12 text-[15px] text-[#1a1a1a] placeholder-[#a0b4bc] font-inter outline-none focus:border-[#1e2b24] transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#a0b4bc]"
+                >
+                  {showPassword ? '👁' : '👁‍🗨'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Section */}
+          <div className="flex flex-col gap-6 items-center w-full">
+            <div className="flex flex-col gap-4 items-center w-full">
+              {/* Instagram Button */}
+              <button
+                onClick={handleInstagramConnect}
+                disabled={isLoading}
+                className="w-full py-4 px-6 rounded-[26px] flex items-center justify-center gap-2 font-inter font-semibold text-white text-[15px] transition-opacity hover:opacity-90 disabled:opacity-70"
+                style={{
+                  background: 'linear-gradient(to bottom, #833ab4, #e1306c 50%, #f77737)'
+                }}
+              >
+                <img
+                  src="https://www.figma.com/api/mcp/asset/6179db57-d673-4070-a054-e4f4ba3a3365"
+                  alt="Instagram"
+                  className="w-5 h-5"
+                />
+                {isLoading ? 'Connecting...' : 'Connect with Instagram'}
+              </button>
+
+              <p className="font-inter font-medium text-[#1e2b24] text-[13px] cursor-pointer hover:underline">
+                Forgot password?
+              </p>
+            </div>
+
+            <p className="font-inter text-[#5c6365] text-[12px] text-center leading-relaxed">
+              We only use your credentials to connect your account. Your password is never stored.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+  )
 }
