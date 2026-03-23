@@ -93,6 +93,12 @@ export default function HomePage() {
               {col2.map(r => <RecipeCard key={r.id} recipe={r} />)}
             </div>
           </div>
+          {filteredRecipes.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+              <p className="font-playfair font-bold text-[#1a1a1a] text-lg">No recipes found</p>
+              <p className="font-inter text-[#5c6365] text-sm text-center">No recipes match this filter yet. Add more recipes to grow your collection.</p>
+            </div>
+          )}
         </div>
       </div>
       {showModal && <AddRecipeModal onClose={() => setShowModal(false)} onSaved={() => { setShowModal(false); window.location.reload() }} />}
