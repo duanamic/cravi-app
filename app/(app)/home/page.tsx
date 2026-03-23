@@ -56,7 +56,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#f4fbfd] flex flex-col">
-      <div className="flex items-center justify-between px-5 py-[14px] border-b border-[#d6dee8]">
+      <div className="sticky top-0 z-50 flex items-center justify-between px-5 py-[14px] border-b border-[#d6dee8] bg-[#f4fbfd]">
         <Link href="/home" className="flex items-center gap-2">
           <img src={imgFrame} alt="Cravi" className="w-7 h-7" />
           <span className="font-playfair font-bold text-[#3b6370] text-[19px]">Cravi</span>
