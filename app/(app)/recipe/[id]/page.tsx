@@ -10,6 +10,7 @@ const imgFrame = "https://www.figma.com/api/mcp/asset/9c798a3a-59e0-433f-b570-66
 const imgPlus = "https://www.figma.com/api/mcp/asset/10967774-ad84-40dc-9eb5-8a8972c209d9"
 const imgUser = "https://www.figma.com/api/mcp/asset/ff62e3c2-4b3e-474c-a5a7-dde74034b100"
 const imgSource = "https://www.figma.com/api/mcp/asset/dd32631d-3942-4ebb-9d86-901f9867e36f"
+const imgIgLinkIcon = "https://www.figma.com/api/mcp/asset/38904227-8d27-4c01-b20e-d0a84a341d81"
 
 export default function RecipeDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -85,7 +86,19 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
 
       <div className="bg-white rounded-t-3xl -mt-6 relative px-6 pt-8 pb-24 flex flex-col gap-5">
         <div className="w-10 h-1 bg-[#d4d4d4] rounded-full mx-auto" />
-        <h1 className="font-playfair font-bold text-[#1a1a1a] text-[28px] leading-snug">{recipe.title}</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="font-playfair font-bold text-[#1a1a1a] text-[28px] leading-snug flex-1">{recipe.title}</h1>
+          {recipe.source_url && (
+            <a
+              href={recipe.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 flex-shrink-0"
+            >
+              <img src={imgIgLinkIcon} alt="View on Instagram" className="w-4 h-4" />
+            </a>
+          )}
+        </div>
 
         {recipe.source_handle && (
           <div className="flex items-center gap-2">
