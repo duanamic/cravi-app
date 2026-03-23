@@ -85,14 +85,16 @@ export default function HomePage() {
             <span className="font-playfair font-bold text-[#1a1a1a] text-[13px]">Your Collection</span>
             <span className="bg-[#3b6370] text-white text-[9px] font-inter font-semibold px-2 py-1 rounded-xl">{filteredRecipes.length}</span>
           </div>
-          <div className="flex gap-3">
-            <div className="flex-1 flex flex-col gap-3">
-              {col1.map(r => <RecipeCard key={r.id} recipe={r} />)}
+          {filteredRecipes.length > 0 && (
+            <div className="flex gap-3">
+              <div className="flex-1 flex flex-col gap-3">
+                {col1.map(r => <RecipeCard key={r.id} recipe={r} />)}
+              </div>
+              <div className="flex-1 flex flex-col gap-3">
+                {col2.map(r => <RecipeCard key={r.id} recipe={r} />)}
+              </div>
             </div>
-            <div className="flex-1 flex flex-col gap-3">
-              {col2.map(r => <RecipeCard key={r.id} recipe={r} />)}
-            </div>
-          </div>
+          )}
           {filteredRecipes.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
               <p className="font-playfair font-bold text-[#1a1a1a] text-lg">No recipes found</p>
