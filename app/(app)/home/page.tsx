@@ -115,7 +115,7 @@ function RecipeCard({ recipe }: { recipe: any }) {
       <div className="bg-white rounded-xl overflow-hidden shadow-sm">
         <div className="w-full h-[150px] bg-[#dde4e6] relative">
           {recipe.image_url ? (
-            <img src={recipe.image_url} alt={recipe.title} className="w-full h-full object-cover" />
+            <img src={`/api/image-proxy?url=${encodeURIComponent(recipe.image_url)}`} alt={recipe.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center p-3">
               <span className="font-inter text-[#5c6365] text-xs text-center leading-relaxed">{recipe.title}</span>
@@ -243,7 +243,7 @@ function AddRecipeModal({ onClose, onSaved }: { onClose: () => void, onSaved: ()
           <label className="font-inter font-semibold text-[#1a1a1a] text-[13px]">Instagram Recipe URL</label>
           <input value={url} onChange={e => setUrl(e.target.value)}
             placeholder="https://www.instagram.com/reels/..."
-            className="w-full h-[47px] border border-[#dce8eb] rounded-lg px-4 font-inter text-[13px] text-[#1a1a1a] placeholder-[#a0b4bc] outline-none focus:border-[#3b6370]" />
+            className="w-full h-[47px] border border-[#dce8eb] rounded-lg px-4 font-inter text-[16px] text-[#1a1a1a] placeholder-[#a0b4bc] outline-none focus:border-[#3b6370]" />
           {error && <p className="font-inter text-red-500 text-xs">{error}</p>}
         </div>
         <button onClick={handleAdd} disabled={loading || !url.trim()}
