@@ -113,8 +113,14 @@ function RecipeCard({ recipe }: { recipe: any }) {
   return (
     <Link href={`/recipe/${recipe.id}`}>
       <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-        <div className="w-full h-[150px] bg-[#dde4e6] flex items-center justify-center p-3">
-          <span className="font-inter text-[#5c6365] text-xs text-center leading-relaxed">{recipe.title}</span>
+        <div className="w-full h-[150px] bg-[#dde4e6] relative">
+          {recipe.image_url ? (
+            <img src={recipe.image_url} alt={recipe.title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center p-3">
+              <span className="font-inter text-[#5c6365] text-xs text-center leading-relaxed">{recipe.title}</span>
+            </div>
+          )}
         </div>
         <div className="p-3 flex flex-col gap-2">
           <p className="font-playfair font-semibold text-[#1a1a1a] text-base leading-tight">{recipe.title}</p>
@@ -174,6 +180,7 @@ function AddRecipeModal({ onClose, onSaved }: { onClose: () => void, onSaved: ()
         ingredients: result.ingredients || [],
         steps: result.steps || [],
         tags: result.tags || {},
+        image_url: result.image_url || '',
       })
       if (insertError) throw insertError
       onSaved()

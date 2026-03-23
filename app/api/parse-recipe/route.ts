@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-async function fetchInstagramCaption(url: string): Promise<string> {
+async function fetchInstagramMeta(url: string): Promise<{ caption: string; imageUrl: string }> {
   try {
     const res = await fetch(url, {
       headers: {
@@ -12,15 +12,15 @@ async function fetchInstagramCaption(url: string): Promise<string> {
       },
     })
     const html = await res.text()
-    // Extract og:description which contains the caption
-    const match = html.match(/<meta property="og:description" content="([^"]+)"/)
-    if (match) return match[1]
-    // Fallback: try twitter:description
-    const match2 = html.match(/<meta name="twitter:description" content="([^"]+)"/)
-    if (match2) return match2[1]
-    return ''
+    const captionMatch = html.match(/<meta property="og:description" content="([^"]+)"/)
+    const captionMatch2 = html.match(/<meta name="twitter:description" content="([^"]+)"/)
+    const imageMatch = html.match(/<meta property="og:image" content="([^"]+)"/)
+    return {
+      caption: captionMatch?.[1] || captionMatch2?.[1] || '',
+      imageUrl: imageMatch?.[1] || '',
+    }
   } catch {
-    return ''
+    return { caption: '', imageUrl: '' }
   }
 }
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     if (!url) return NextResponse.json({ error: 'URL is required' }, { status: 400 })
 
     // Try to get the real caption from Instagram
-    const caption = await fetchInstagramCaption(url)
+    const { caption, imageUrl } = await fetchInstagramMeta(url)
 
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
@@ -66,7 +66,7 @@ Based on the caption and URL, extract or create a realistic recipe. Return ONLY 
     if (content.type !== 'text') throw new Error('Unexpected response type')
     const clean = content.text.replace(/```json|```/g, '').trim()
     const recipe = JSON.parse(clean)
-    return NextResponse.json({ success: true, recipe })
+    return NextResponse.json({ success: true, recipe: { ...recipe, image_url: imageUrl } })
   } catch (error) {
     console.error('Recipe parsing error:', error)
     return NextResponse.json({ error: 'Failed to parse recipe' }, { status: 500 })

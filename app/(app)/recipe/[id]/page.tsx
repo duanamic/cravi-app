@@ -71,11 +71,17 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
         </div>
       </div>
 
-      <div className="relative w-full h-[240px] bg-[#3b6370] flex items-center justify-center px-10">
-        <p className="font-playfair font-bold text-white text-2xl text-center leading-snug">{recipe.title}</p>
+      <div className="relative w-full h-[240px] bg-[#3b6370]">
+        {recipe.image_url ? (
+          <img src={recipe.image_url} alt={recipe.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center px-10">
+            <p className="font-playfair font-bold text-white text-2xl text-center leading-snug">{recipe.title}</p>
+          </div>
+        )}
         <button
           onClick={handleShare}
-          className="absolute top-4 right-4 w-11 h-11 bg-white/20 rounded-full flex items-center justify-center"
+          className="absolute top-4 right-4 w-11 h-11 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
         >
           {copied
             ? <span className="text-white text-[10px] font-inter font-semibold">Copied!</span>
