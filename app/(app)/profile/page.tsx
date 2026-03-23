@@ -27,6 +27,9 @@ export default function ProfilePage() {
       setCount(total || 0)
     }
     fetchCount()
+    const handleFocus = () => fetchCount()
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
   }, [])
 
   const handleSignOut = async () => {
