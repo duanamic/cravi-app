@@ -82,6 +82,7 @@ export default function AuthPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSubmit()}
                   placeholder="••••••••••••••"
                   className="flex-1 font-inter text-[15px] text-[#1a1a1a] placeholder-[#848a8c] outline-none bg-transparent"
                 />
