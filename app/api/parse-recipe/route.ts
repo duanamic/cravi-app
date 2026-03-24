@@ -5,10 +5,6 @@ import { createClient } from '@supabase/supabase-js'
 export const dynamic = 'force-dynamic'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 async function fetchInstagramMeta(url: string): Promise<{ caption: string; imageUrl: string }> {
   try {
@@ -32,6 +28,10 @@ async function fetchInstagramMeta(url: string): Promise<{ caption: string; image
 }
 
 async function uploadImageToStorage(imageUrl: string): Promise<string> {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   try {
     const res = await fetch(imageUrl, {
       headers: {
