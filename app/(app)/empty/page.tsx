@@ -31,7 +31,7 @@ export default function EmptyStatePage() {
             <img src={imgChef} alt="Chef" className="w-12 h-12" />
           </div>
           <p className="font-playfair font-bold text-[#1b1b1b] text-[22px]">No recipes yet</p>
-          <p className="font-inter text-[#5c6365] text-sm text-center leading-relaxed w-[280px]">Start building your collection by importing from Instagram or adding a recipe URL.</p>
+          <p className="font-inter text-[#5c6365] text-sm text-center leading-relaxed w-[280px]">Start building your collection by adding a recipe URL from Instagram or TikTok.</p>
         </div>
         <button onClick={() => setShowModal(true)} className="w-full h-[50px] bg-[#3b6370] rounded-full flex items-center justify-center gap-2">
           <img src={imgUrl} alt="URL" className="w-[18px] h-[18px]" />
@@ -167,13 +167,13 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
             <img src={imgCloseIcon} alt="Close" className="w-4 h-4" />
           </button>
         </div>
-        <p className="font-inter text-[#5c6365] text-sm leading-relaxed">Paste a recipe URL from Instagram and we will automatically import it into your collection.</p>
+        <p className="font-inter text-[#5c6365] text-sm leading-relaxed">Paste a recipe URL from Instagram or TikTok and we'll automatically import it into your collection.</p>
         <div className="flex flex-col gap-2">
-          <label className="font-inter font-semibold text-[#1a1a1a] text-[13px]">Instagram Recipe URL</label>
+          <label className="font-inter font-semibold text-[#1a1a1a] text-[13px]">Recipe URL</label>
           <input
             value={url}
             onChange={e => setUrl(e.target.value)}
-            placeholder="https://www.instagram.com/reels/..."
+            placeholder="Paste an Instagram or TikTok link..."
             className="w-full h-[47px] border border-[#dce8eb] rounded-lg px-4 font-inter text-[13px] text-[#1a1a1a] placeholder-[#a0b4bc] outline-none focus:border-[#3b6370]"
           />
           {error && <p className="font-inter text-red-500 text-xs">{error}</p>}

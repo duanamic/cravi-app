@@ -22,17 +22,20 @@ function isRateLimited(userId: string): boolean {
   return entry.count > RATE_LIMIT
 }
 
-function isValidInstagramUrl(url: string): boolean {
+function isValidRecipeUrl(url: string): boolean {
   try {
     const parsed = new URL(url)
-    const allowed = ['www.instagram.com', 'instagram.com']
+    const allowed = [
+      'www.instagram.com', 'instagram.com',
+      'www.tiktok.com', 'tiktok.com', 'vm.tiktok.com',
+    ]
     return allowed.includes(parsed.hostname) && ['https:', 'http:'].includes(parsed.protocol)
   } catch {
     return false
   }
 }
 
-async function fetchInstagramMeta(url: string): Promise<{ caption: string }> {
+async function fetchPostMeta(url: string): Promise<{ caption: string }> {
   try {
     const res = await fetch(url, {
       headers: {
@@ -71,22 +74,22 @@ export async function POST(request: NextRequest) {
     const { url } = await request.json()
     if (!url) return NextResponse.json({ error: 'URL is required' }, { status: 400 })
 
-    // URL validation — only allow Instagram URLs (prevents SSRF)
-    if (!isValidInstagramUrl(url)) {
+    // URL validation — only allow Instagram and TikTok URLs (prevents SSRF)
+    if (!isValidRecipeUrl(url)) {
       return NextResponse.json(
-        { error: 'Only Instagram URLs are supported' },
+        { error: 'Only Instagram and TikTok URLs are supported' },
         { status: 400 }
       )
     }
 
-    const { caption } = await fetchInstagramMeta(url)
+    const { caption } = await fetchPostMeta(url)
 
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
       messages: [{
         role: 'user',
-        content: `You are a recipe extraction assistant. Extract and structure a recipe from this Instagram post.
+        content: `You are a recipe extraction assistant. Extract and structure a recipe from this social media post.
 
 URL: ${url}
 ${caption ? `Post caption: ${caption}` : 'No caption available — infer from URL.'}
@@ -96,7 +99,7 @@ Based on the caption and URL, extract or create a realistic recipe. Return ONLY 
 {
   "title": "Recipe name",
   "source_handle": "@handle_from_url_or_caption",
-  "platform": "instagram",
+  "platform": "${url.includes('tiktok.com') ? 'tiktok' : 'instagram'}",
   "prep_time": "X min",
   "difficulty": "Easy|Medium|Hard",
   "ingredients": ["ingredient 1", "ingredient 2", "ingredient 3", "ingredient 4", "ingredient 5"],

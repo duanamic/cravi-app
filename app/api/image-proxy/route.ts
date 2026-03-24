@@ -9,6 +9,8 @@ function isAllowedImageUrl(url: string): boolean {
       'cdninstagram.com',
       'fbcdn.net',
       'supabase.co',
+      'tiktokcdn.com',
+      'tiktokcdn-us.com',
     ]
     return (
       ['https:', 'http:'].includes(parsed.protocol) &&
