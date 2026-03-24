@@ -1,8 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+
+function isAllowedImageUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    const allowed = [
+      'instagram.com',
+      'cdninstagram.com',
+      'fbcdn.net',
+      'supabase.co',
+    ]
+    return (
+      ['https:', 'http:'].includes(parsed.protocol) &&
+      allowed.some((domain) => parsed.hostname.endsWith(domain))
+    )
+  } catch {
+    return false
+  }
+}
 
 export async function GET(request: NextRequest) {
+  // Auth check — reject unauthenticated requests
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return new NextResponse('Unauthorized', { status: 401 })
+  }
+
   const url = request.nextUrl.searchParams.get('url')
   if (!url) return new NextResponse('Missing url', { status: 400 })
+
+  // URL validation — only allow known image CDNs (prevents open proxy / SSRF)
+  if (!isAllowedImageUrl(url)) {
+    return new NextResponse('URL not allowed', { status: 403 })
+  }
 
   try {
     const res = await fetch(url, {

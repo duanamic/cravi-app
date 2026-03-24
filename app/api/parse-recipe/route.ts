@@ -1,9 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+
+// In-memory rate limit: max 20 recipe parses per user per hour
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+const RATE_LIMIT = 20
+const RATE_WINDOW_MS = 60 * 60 * 1000 // 1 hour
+
+function isRateLimited(userId: string): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(userId)
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_WINDOW_MS })
+    return false
+  }
+  entry.count++
+  return entry.count > RATE_LIMIT
+}
+
+function isValidInstagramUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    const allowed = ['www.instagram.com', 'instagram.com']
+    return allowed.includes(parsed.hostname) && ['https:', 'http:'].includes(parsed.protocol)
+  } catch {
+    return false
+  }
+}
 
 async function fetchInstagramMeta(url: string): Promise<{ caption: string }> {
   try {
@@ -26,8 +53,31 @@ async function fetchInstagramMeta(url: string): Promise<{ caption: string }> {
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth check — reject unauthenticated requests
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Rate limit — prevent runaway API costs
+    if (isRateLimited(user.id)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      )
+    }
+
     const { url } = await request.json()
     if (!url) return NextResponse.json({ error: 'URL is required' }, { status: 400 })
+
+    // URL validation — only allow Instagram URLs (prevents SSRF)
+    if (!isValidInstagramUrl(url)) {
+      return NextResponse.json(
+        { error: 'Only Instagram URLs are supported' },
+        { status: 400 }
+      )
+    }
 
     const { caption } = await fetchInstagramMeta(url)
 
