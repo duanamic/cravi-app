@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { createClient } from '@supabase/supabase-js'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 async function fetchInstagramMeta(url: string): Promise<{ caption: string; imageUrl: string }> {
   try {
@@ -24,12 +29,33 @@ async function fetchInstagramMeta(url: string): Promise<{ caption: string; image
   }
 }
 
+async function uploadImageToStorage(imageUrl: string): Promise<string> {
+  try {
+    const res = await fetch(imageUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1)',
+        'Referer': 'https://www.instagram.com/',
+      },
+    })
+    if (!res.ok) return ''
+    const buffer = await res.arrayBuffer()
+    const filename = `recipe-${Date.now()}.jpg`
+    const { error } = await supabase.storage
+      .from('recipe-images')
+      .upload(filename, buffer, { contentType: 'image/jpeg', upsert: false })
+    if (error) return ''
+    const { data } = supabase.storage.from('recipe-images').getPublicUrl(filename)
+    return data.publicUrl
+  } catch {
+    return ''
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { url } = await request.json()
     if (!url) return NextResponse.json({ error: 'URL is required' }, { status: 400 })
 
-    // Try to get the real caption from Instagram
     const { caption, imageUrl } = await fetchInstagramMeta(url)
 
     const message = await client.messages.create({
@@ -66,7 +92,10 @@ Based on the caption and URL, extract or create a realistic recipe. Return ONLY 
     if (content.type !== 'text') throw new Error('Unexpected response type')
     const clean = content.text.replace(/```json|```/g, '').trim()
     const recipe = JSON.parse(clean)
-    return NextResponse.json({ success: true, recipe: { ...recipe, image_url: imageUrl } })
+
+    const storedImageUrl = imageUrl ? await uploadImageToStorage(imageUrl) : ''
+
+    return NextResponse.json({ success: true, recipe: { ...recipe, image_url: storedImageUrl } })
   } catch (error) {
     console.error('Recipe parsing error:', error)
     return NextResponse.json({ error: 'Failed to parse recipe' }, { status: 500 })
