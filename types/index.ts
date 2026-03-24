@@ -13,7 +13,13 @@ export interface Recipe {
   platform: "instagram" | "tiktok" | "other" | null;
   ingredients: string[] | null;
   steps: string[] | null;
-  tags: string[] | null;
+  tags: Record<string, string> | null;
   prep_time: string | null;
+  created_at: string;
+}
+
+export interface Profile {
+  id: string;
+  display_name: string | null;
   created_at: string;
 }

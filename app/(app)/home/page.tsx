@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Search } from 'lucide-react'
 
 const imgFrame = "https://www.figma.com/api/mcp/asset/aeebbe46-37b1-4a3c-a82b-8798db9ebb1e"
 const imgPlus = "https://www.figma.com/api/mcp/asset/148c5e63-dadf-4d16-b17d-4c82bf443727"
@@ -18,11 +19,19 @@ export default function HomePage() {
   const [activeChip, setActiveChip] = useState('All')
   const [chips, setChips] = useState<string[]>(['All'])
   const [showModal, setShowModal] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [displayName, setDisplayName] = useState('')
 
   useEffect(() => {
     const loadRecipes = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/'); return }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single()
+      if (profile?.display_name) setDisplayName(profile.display_name)
       const { data } = await supabase
         .from('recipes')
         .select('*')
@@ -45,9 +54,14 @@ export default function HomePage() {
     loadRecipes()
   }, [])
 
-  const filteredRecipes = activeChip === 'All'
-    ? recipes
-    : recipes.filter(r => r.tags && Object.values(r.tags).includes(activeChip))
+  const filteredRecipes = recipes.filter(r => {
+    const matchesTag = activeChip === 'All' || (r.tags && Object.values(r.tags).includes(activeChip))
+    if (!searchQuery.trim()) return matchesTag
+    const query = searchQuery.toLowerCase()
+    const matchesTitle = r.title?.toLowerCase().includes(query)
+    const matchesIngredients = Array.isArray(r.ingredients) && r.ingredients.some((ing: string) => ing.toLowerCase().includes(query))
+    return matchesTag && (matchesTitle || matchesIngredients)
+  })
 
   const col1 = filteredRecipes.filter((_, i) => i % 2 === 0)
   const col2 = filteredRecipes.filter((_, i) => i % 2 === 1)
@@ -71,7 +85,18 @@ export default function HomePage() {
         </div>
       </div>
       <div className="flex flex-col gap-6 px-5 py-6 flex-1">
-        <p className="font-playfair font-bold text-[#1b1b1b] text-[28px] leading-tight">What are you craving?</p>
+        <p className="font-playfair font-bold text-[#1b1b1b] text-[28px] leading-tight">
+          {displayName ? `Hi, ${displayName}!` : 'What are you craving?'}
+        </p>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#a0b4bc]" />
+          <input
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Search recipes or ingredients..."
+            className="w-full h-[44px] bg-white border border-[#dce8eb] rounded-xl px-4 pl-10 font-inter text-[14px] text-[#1a1a1a] placeholder-[#a0b4bc] outline-none focus:border-[#3b6370]"
+          />
+        </div>
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-5 px-5">
           {chips.map(c => (
             <button key={c} onClick={() => setActiveChip(c)}
@@ -98,7 +123,11 @@ export default function HomePage() {
           {filteredRecipes.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
               <p className="font-playfair font-bold text-[#1a1a1a] text-lg">No recipes found</p>
-              <p className="font-inter text-[#5c6365] text-sm text-center">No recipes match this filter yet. Add more recipes to grow your collection.</p>
+              <p className="font-inter text-[#5c6365] text-sm text-center">
+                {searchQuery.trim()
+                  ? `No recipes match "${searchQuery}". Try a different search.`
+                  : 'No recipes match this filter yet. Add more recipes to grow your collection.'}
+              </p>
             </div>
           )}
         </div>
@@ -232,11 +261,11 @@ function AddRecipeModal({ onClose, onSaved }: { onClose: () => void, onSaved: ()
             <img src={imgCloseIcon} alt="Close" className="w-4 h-4" />
           </button>
         </div>
-        <p className="font-inter text-[#5c6365] text-sm leading-relaxed">Paste a recipe URL from Instagram and we will automatically import it into your collection.</p>
+        <p className="font-inter text-[#5c6365] text-sm leading-relaxed">Paste a recipe URL from Instagram or TikTok and we'll automatically import it into your collection.</p>
         <div className="flex flex-col gap-2">
-          <label className="font-inter font-semibold text-[#1a1a1a] text-[13px]">Instagram Recipe URL</label>
+          <label className="font-inter font-semibold text-[#1a1a1a] text-[13px]">Recipe URL</label>
           <input value={url} onChange={e => setUrl(e.target.value)}
-            placeholder="https://www.instagram.com/reels/..."
+            placeholder="Paste an Instagram or TikTok link..."
             className="w-full h-[47px] border border-[#dce8eb] rounded-lg px-4 font-inter text-[16px] text-[#1a1a1a] placeholder-[#a0b4bc] outline-none focus:border-[#3b6370]" />
           {error && <p className="font-inter text-red-500 text-xs">{error}</p>}
         </div>
