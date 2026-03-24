@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
-import { createClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-async function fetchInstagramMeta(url: string): Promise<{ caption: string; imageUrl: string }> {
+async function fetchInstagramMeta(url: string): Promise<{ caption: string }> {
   try {
     const res = await fetch(url, {
       headers: {
@@ -17,39 +16,11 @@ async function fetchInstagramMeta(url: string): Promise<{ caption: string; image
     const html = await res.text()
     const captionMatch = html.match(/<meta property="og:description" content="([^"]+)"/)
     const captionMatch2 = html.match(/<meta name="twitter:description" content="([^"]+)"/)
-    const imageMatch = html.match(/<meta property="og:image" content="([^"]+)"/)
     return {
       caption: captionMatch?.[1] || captionMatch2?.[1] || '',
-      imageUrl: imageMatch?.[1] || '',
     }
   } catch {
-    return { caption: '', imageUrl: '' }
-  }
-}
-
-async function uploadImageToStorage(imageUrl: string): Promise<string> {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-  try {
-    const res = await fetch(imageUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1)',
-        'Referer': 'https://www.instagram.com/',
-      },
-    })
-    if (!res.ok) return ''
-    const buffer = await res.arrayBuffer()
-    const filename = `recipe-${Date.now()}.jpg`
-    const { error } = await supabase.storage
-      .from('recipe-images')
-      .upload(filename, buffer, { contentType: 'image/jpeg', upsert: false })
-    if (error) return ''
-    const { data } = supabase.storage.from('recipe-images').getPublicUrl(filename)
-    return data.publicUrl
-  } catch {
-    return ''
+    return { caption: '' }
   }
 }
 
@@ -58,7 +29,7 @@ export async function POST(request: NextRequest) {
     const { url } = await request.json()
     if (!url) return NextResponse.json({ error: 'URL is required' }, { status: 400 })
 
-    const { caption, imageUrl } = await fetchInstagramMeta(url)
+    const { caption } = await fetchInstagramMeta(url)
 
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
@@ -94,10 +65,7 @@ Based on the caption and URL, extract or create a realistic recipe. Return ONLY 
     if (content.type !== 'text') throw new Error('Unexpected response type')
     const clean = content.text.replace(/```json|```/g, '').trim()
     const recipe = JSON.parse(clean)
-
-    const storedImageUrl = imageUrl ? await uploadImageToStorage(imageUrl) : ''
-
-    return NextResponse.json({ success: true, recipe: { ...recipe, image_url: storedImageUrl } })
+    return NextResponse.json({ success: true, recipe })
   } catch (error) {
     console.error('Recipe parsing error:', error)
     return NextResponse.json({ error: 'Failed to parse recipe' }, { status: 500 })

@@ -71,14 +71,8 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
         </div>
       </div>
 
-      <div className="relative w-full h-[240px] bg-[#3b6370]">
-        {recipe.image_url ? (
-          <img src={`/api/image-proxy?url=${encodeURIComponent(recipe.image_url)}`} alt={recipe.title} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center px-10">
-            <p className="font-playfair font-bold text-white text-2xl text-center leading-snug">{recipe.title}</p>
-          </div>
-        )}
+      <div className="relative w-full h-[240px] bg-[#3b6370] flex items-center justify-center px-10">
+        <p className="font-playfair font-bold text-white text-2xl text-center leading-snug">{recipe.title}</p>
         <button
           onClick={handleShare}
           className="absolute top-4 right-4 w-11 h-11 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
