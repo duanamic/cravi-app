@@ -42,21 +42,20 @@ export default function HomePage() {
         return
       }
       setRecipes(data)
-      // Build chips from cuisine + mood tags, sorted by popularity
-      const tagCounts = new Map<string, number>()
+      const allTags = new Set<string>()
       data.forEach(r => {
-        if (r.tags?.cuisine) tagCounts.set(r.tags.cuisine, (tagCounts.get(r.tags.cuisine) || 0) + 1)
-        if (r.tags?.mood) tagCounts.set(r.tags.mood, (tagCounts.get(r.tags.mood) || 0) + 1)
+        if (r.tags?.cuisine) {
+          allTags.add(r.tags.cuisine)
+        }
       })
-      const sorted = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).map(([tag]) => tag)
-      setChips(['All', ...sorted])
+      setChips(['All', ...Array.from(allTags)])
       setLoading(false)
     }
     loadRecipes()
   }, [])
 
   const filteredRecipes = recipes.filter(r => {
-    const matchesTag = activeChip === 'All' || r.tags?.cuisine === activeChip || r.tags?.mood === activeChip
+    const matchesTag = activeChip === 'All' || r.tags?.cuisine === activeChip
     if (!searchQuery.trim()) return matchesTag
     const query = searchQuery.toLowerCase()
     const matchesTitle = r.title?.toLowerCase().includes(query)
@@ -227,10 +226,13 @@ function AddRecipeModal({ onClose, onSaved }: { onClose: () => void, onSaved: ()
           <p className="font-playfair font-bold text-[#1a1a1a] text-[20px] leading-snug">{result.title}</p>
           <div className="h-[260px] overflow-y-auto flex flex-col gap-5 pr-1">
             <p className="font-inter text-[#5c6365] text-[12px]">{result.source_handle} • {result.prep_time}</p>
-            <div className="flex flex-wrap gap-2">
-              {Object.values(result.tags || {}).map((tag: any, i) => (
-                <span key={i} className="bg-[#dde4e6] text-[#1e2b24] font-inter font-medium text-[10px] px-[14px] py-[6px] rounded-full">{tag}</span>
-              ))}
+            <div className="flex flex-col gap-2">
+              {result.tags?.cuisine && (
+                <span className="bg-[#3b6370] text-white font-inter font-medium text-[10px] px-[14px] py-[6px] rounded-full self-start">{result.tags.cuisine}</span>
+              )}
+              <p className="font-inter text-[#5c6365] text-[11px]">
+                {[result.tags?.mood, result.tags?.occasion, result.tags?.time].filter(Boolean).join(' · ')}
+              </p>
             </div>
             <div className="h-px bg-[#dde4e6] w-full flex-shrink-0" />
             <div className="flex flex-col gap-[14px]">

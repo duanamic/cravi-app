@@ -216,12 +216,16 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
             ))}
           </div>
         ) : tagEntries.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {tagEntries.map(([key, value]) => (
-              <span key={key} className="bg-[#dde4e6] text-[#1e2b24] font-inter font-medium text-xs px-[14px] py-[6px] rounded-full">
-                {value}
-              </span>
-            ))}
+          <div className="flex flex-col gap-2">
+            {recipe.tags?.cuisine && (
+              <span className="bg-[#3b6370] text-white font-inter font-medium text-xs px-[14px] py-[6px] rounded-full self-start">{recipe.tags.cuisine}</span>
+            )}
+            {(() => {
+              const secondary = [recipe.tags?.mood, recipe.tags?.occasion, recipe.tags?.time].filter(Boolean)
+              return secondary.length > 0 ? (
+                <p className="font-inter text-[#5c6365] text-[13px]">{secondary.join(' · ')}</p>
+              ) : null
+            })()}
           </div>
         ) : null}
 

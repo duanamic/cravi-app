@@ -123,10 +123,13 @@ function AddRecipeModal({ onClose }: { onClose: () => void }) {
             </p>
 
             {/* Tags */}
-            <div className="flex flex-wrap gap-2">
-              {Object.values(result.tags || {}).map((tag: any, i) => (
-                <span key={i} className="bg-[#dde4e6] text-[#1e2b24] font-inter font-medium text-[10px] px-[14px] py-[6px] rounded-full">{tag}</span>
-              ))}
+            <div className="flex flex-col gap-2">
+              {result.tags?.cuisine && (
+                <span className="bg-[#3b6370] text-white font-inter font-medium text-[10px] px-[14px] py-[6px] rounded-full self-start">{result.tags.cuisine}</span>
+              )}
+              <p className="font-inter text-[#5c6365] text-[11px]">
+                {[result.tags?.mood, result.tags?.occasion, result.tags?.time].filter(Boolean).join(' · ')}
+              </p>
             </div>
 
             {/* Divider */}
