@@ -42,20 +42,21 @@ export default function HomePage() {
         return
       }
       setRecipes(data)
-      const allTags = new Set<string>()
+      // Build chips from cuisine + mood tags, sorted by popularity
+      const tagCounts = new Map<string, number>()
       data.forEach(r => {
-        if (r.tags?.cuisine) {
-          allTags.add(r.tags.cuisine)
-        }
+        if (r.tags?.cuisine) tagCounts.set(r.tags.cuisine, (tagCounts.get(r.tags.cuisine) || 0) + 1)
+        if (r.tags?.mood) tagCounts.set(r.tags.mood, (tagCounts.get(r.tags.mood) || 0) + 1)
       })
-      setChips(['All', ...Array.from(allTags)])
+      const sorted = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).map(([tag]) => tag)
+      setChips(['All', ...sorted])
       setLoading(false)
     }
     loadRecipes()
   }, [])
 
   const filteredRecipes = recipes.filter(r => {
-    const matchesTag = activeChip === 'All' || r.tags?.cuisine === activeChip
+    const matchesTag = activeChip === 'All' || r.tags?.cuisine === activeChip || r.tags?.mood === activeChip
     if (!searchQuery.trim()) return matchesTag
     const query = searchQuery.toLowerCase()
     const matchesTitle = r.title?.toLowerCase().includes(query)
