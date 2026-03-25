@@ -110,7 +110,9 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
 
   const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : []
   const steps = Array.isArray(recipe.steps) ? recipe.steps : []
-  const tags = recipe.tags && typeof recipe.tags === 'object' ? Object.values(recipe.tags) : []
+  const tagEntries = recipe.tags && typeof recipe.tags === 'object'
+    ? Object.entries(recipe.tags).filter(([_, v]) => v) as [string, string][]
+    : []
 
   return (
     <div className="min-h-screen bg-[#f4fbfd]">
@@ -213,10 +215,12 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
               </div>
             ))}
           </div>
-        ) : tags.length > 0 ? (
+        ) : tagEntries.length > 0 ? (
           <div className="flex flex-wrap gap-2">
-            {tags.map((tag: any, i) => (
-              <span key={i} className="bg-[#dde4e6] text-[#1e2b24] font-inter font-medium text-xs px-[14px] py-[6px] rounded-full">{tag}</span>
+            {tagEntries.map(([key, value]) => (
+              <span key={key} className="bg-[#dde4e6] text-[#1e2b24] font-inter font-medium text-xs px-[14px] py-[6px] rounded-full">
+                {value}
+              </span>
             ))}
           </div>
         ) : null}
