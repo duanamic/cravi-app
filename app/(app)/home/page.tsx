@@ -44,8 +44,8 @@ export default function HomePage() {
       setRecipes(data)
       const allTags = new Set<string>()
       data.forEach(r => {
-        if (r.tags && typeof r.tags === 'object') {
-          Object.values(r.tags).forEach((t: any) => allTags.add(t))
+        if (r.tags?.cuisine) {
+          allTags.add(r.tags.cuisine)
         }
       })
       setChips(['All', ...Array.from(allTags)])
@@ -55,7 +55,7 @@ export default function HomePage() {
   }, [])
 
   const filteredRecipes = recipes.filter(r => {
-    const matchesTag = activeChip === 'All' || (r.tags && Object.values(r.tags).includes(activeChip))
+    const matchesTag = activeChip === 'All' || r.tags?.cuisine === activeChip
     if (!searchQuery.trim()) return matchesTag
     const query = searchQuery.toLowerCase()
     const matchesTitle = r.title?.toLowerCase().includes(query)

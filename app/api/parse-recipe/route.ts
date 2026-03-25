@@ -119,8 +119,13 @@ Based on the caption and URL, extract or create a realistic recipe. Return ONLY 
     const clean = content.text.replace(/```json|```/g, '').trim()
     const recipe = JSON.parse(clean)
     return NextResponse.json({ success: true, recipe })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Recipe parsing error:', error)
-    return NextResponse.json({ error: 'Failed to parse recipe' }, { status: 500 })
+    const message = error?.status === 401
+      ? 'API key is invalid or missing. Please check your Anthropic API key.'
+      : error?.status === 429
+      ? 'AI rate limit reached. Please try again in a minute.'
+      : 'Failed to parse recipe'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
