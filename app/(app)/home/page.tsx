@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Search, Plus, User, X } from 'lucide-react'
+import { CuisineIllustration, CUISINE_GRADIENTS, DEFAULT_GRADIENT } from '@/components/CuisineArt'
 
 export default function HomePage() {
   const router = useRouter()
@@ -160,33 +161,9 @@ export default function HomePage() {
   )
 }
 
-const CUISINE_STYLES: Record<string, { gradient: string; emoji: string }> = {
-  'Italian': { gradient: 'from-[#c0392b] to-[#e74c3c]', emoji: '🍝' },
-  'Mexican': { gradient: 'from-[#e67e22] to-[#f39c12]', emoji: '🌮' },
-  'Mediterranean': { gradient: 'from-[#2980b9] to-[#3498db]', emoji: '🫒' },
-  'Indonesian': { gradient: 'from-[#8e44ad] to-[#9b59b6]', emoji: '🍜' },
-  'Moroccan': { gradient: 'from-[#d35400] to-[#e67e22]', emoji: '🫖' },
-  'Middle Eastern': { gradient: 'from-[#c0392b] to-[#e67e22]', emoji: '🧆' },
-  'Middle Eastern fusion': { gradient: 'from-[#c0392b] to-[#e67e22]', emoji: '🧆' },
-  'Japanese': { gradient: 'from-[#2c3e50] to-[#34495e]', emoji: '🍣' },
-  'Indian': { gradient: 'from-[#f39c12] to-[#e74c3c]', emoji: '🍛' },
-  'North Indian': { gradient: 'from-[#f39c12] to-[#e74c3c]', emoji: '🍛' },
-  'Punjabi': { gradient: 'from-[#f39c12] to-[#e74c3c]', emoji: '🍛' },
-  'Thai': { gradient: 'from-[#27ae60] to-[#f39c12]', emoji: '🍜' },
-  'Chinese': { gradient: 'from-[#c0392b] to-[#f39c12]', emoji: '🥡' },
-  'Korean': { gradient: 'from-[#e74c3c] to-[#2c3e50]', emoji: '🍲' },
-  'French': { gradient: 'from-[#2c3e50] to-[#2980b9]', emoji: '🥐' },
-  'American': { gradient: 'from-[#e74c3c] to-[#3498db]', emoji: '🍔' },
-  'British': { gradient: 'from-[#2c3e50] to-[#7f8c8d]', emoji: '🫖' },
-  'Cajun': { gradient: 'from-[#e74c3c] to-[#d35400]', emoji: '🦐' },
-  'Fusion': { gradient: 'from-[#8e44ad] to-[#2980b9]', emoji: '🍽️' },
-  'International': { gradient: 'from-[#3b6370] to-[#5a8a8a]', emoji: '🌍' },
-}
-const DEFAULT_STYLE = { gradient: 'from-[#3b6370] to-[#5a8a8a]', emoji: '🍴' }
-
 function RecipeCard({ recipe }: { recipe: any }) {
   const cuisine = recipe.tags?.cuisine || ''
-  const { gradient, emoji } = CUISINE_STYLES[cuisine] || DEFAULT_STYLE
+  const gradient = CUISINE_GRADIENTS[cuisine] || DEFAULT_GRADIENT
   return (
     <Link href={`/recipe/${recipe.id}`}>
       <div className="bg-white rounded-xl overflow-hidden shadow-sm">
@@ -197,7 +174,7 @@ function RecipeCard({ recipe }: { recipe: any }) {
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <span className="text-[48px] drop-shadow-lg">{emoji}</span>
+              <CuisineIllustration cuisine={cuisine} />
             </div>
           )}
         </div>
