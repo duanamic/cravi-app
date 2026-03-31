@@ -158,8 +158,8 @@ function RecipeCard({ recipe }: { recipe: any }) {
         {recipe.image_url ? (
           <img src={recipe.image_url} alt={recipe.title} className="w-full h-[150px] object-cover" />
         ) : (
-          <div className={`w-full h-[150px] bg-gradient-to-br ${gradient} flex items-end p-3`}>
-            <span className="font-playfair font-semibold text-white/90 text-[13px] leading-tight line-clamp-2">{recipe.title}</span>
+          <div className={`w-full h-[150px] bg-gradient-to-br ${gradient} flex items-center justify-center p-3`}>
+            <span className="font-playfair font-semibold text-white/90 text-[13px] leading-tight line-clamp-3 text-center">{recipe.title}</span>
           </div>
         )}
         <div className="p-3 flex flex-col gap-2">
