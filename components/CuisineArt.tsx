@@ -276,7 +276,23 @@ const CUISINE_ART: Record<string, () => JSX.Element> = {
   'International': International,
 }
 
+const CUISINE_IMAGES: Record<string, string> = {
+  'Italian': '/cuisine/italian.png',
+  'Mexican': '/cuisine/mexican.png',
+  'Mediterranean': '/cuisine/mediterranean.png',
+  'American': '/cuisine/american.png',
+  'French': '/cuisine/french.png',
+  'British': '/cuisine/british.png',
+  'Thai': '/cuisine/thai.png',
+  'Indonesian': '/cuisine/indonesian.png',
+  'International': '/cuisine/international.png',
+}
+
 export function CuisineIllustration({ cuisine }: { cuisine: string }) {
+  const imageSrc = CUISINE_IMAGES[cuisine]
+  if (imageSrc) {
+    return <img src={imageSrc} alt={cuisine} className="w-20 h-20 object-contain drop-shadow-lg" />
+  }
   const Art = CUISINE_ART[cuisine] || Default
   return <Art />
 }
