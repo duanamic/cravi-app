@@ -1,6 +1,6 @@
 'use client'
 export const dynamic = 'force-dynamic'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Eye, EyeOff } from 'lucide-react'
@@ -8,19 +8,8 @@ import { Eye, EyeOff } from 'lucide-react'
 export default function AuthPage() {
   const router = useRouter()
   const supabase = createClient()
-  const [checkingSession, setCheckingSession] = useState(true)
 
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        router.push('/home')
-      } else {
-        setCheckingSession(false)
-      }
-    }
-    checkSession()
-  }, [])
+  // Session check handled by middleware — no client-side redirect needed
 
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('')
@@ -47,14 +36,6 @@ export default function AuthPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  if (checkingSession) {
-    return (
-      <div className="min-h-screen bg-[#f4fbfd] flex flex-col items-center justify-center">
-        <img src="/icon-192.png" alt="Cravi" className="w-[80px] h-[80px] rounded-2xl animate-pulse" />
-      </div>
-    )
   }
 
   return (
