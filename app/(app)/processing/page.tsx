@@ -3,8 +3,8 @@ export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-const imgFrame = "https://www.figma.com/api/mcp/asset/7a367840-6d98-4b98-b6c5-36eb864bc41a"
-const imgSparkle = "https://www.figma.com/api/mcp/asset/7f413493-7fbf-4c73-a464-7d0282bb4c11"
+import { Sparkles } from 'lucide-react'
+
 export default function ProcessingPage() {
   const [progress, setProgress] = useState(32)
   const router = useRouter()
@@ -17,12 +17,12 @@ export default function ProcessingPage() {
   return (
     <div className="min-h-screen bg-[#f4fbfd] flex flex-col">
       <div className="flex items-center gap-2 px-5 py-[14px] border-b border-[#d6dee8]">
-        <img src={imgFrame} alt="Cravi" className="w-7 h-7" />
+        <img src="/icon-192.png" alt="Cravi" className="w-7 h-7 rounded-md" />
         <span className="font-playfair font-bold text-[#3b6370] text-[19px]">Cravi</span>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center px-10 gap-6">
         <div className="w-[100px] h-[100px] bg-[#dde4e6] rounded-full flex items-center justify-center">
-          <img src={imgSparkle} alt="AI" className="w-12 h-12" />
+          <Sparkles className="w-12 h-12 text-[#3b6370]" />
         </div>
         <div className="w-[280px] h-[6px] bg-[#dde4e6] rounded-full overflow-hidden">
           <div className="h-full bg-[#9db7c0] rounded-full transition-all duration-200" style={{ width: `${(progress/47)*100}%` }} />

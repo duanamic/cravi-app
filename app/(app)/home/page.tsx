@@ -4,12 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Search } from 'lucide-react'
-
-const imgFrame = "https://www.figma.com/api/mcp/asset/aeebbe46-37b1-4a3c-a82b-8798db9ebb1e"
-const imgPlus = "https://www.figma.com/api/mcp/asset/148c5e63-dadf-4d16-b17d-4c82bf443727"
-const imgUser = "https://www.figma.com/api/mcp/asset/8bc6031a-890d-40dd-8c68-6444e046ef8f"
-const imgCloseIcon = "https://www.figma.com/api/mcp/asset/36af6e40-bd8d-4432-9848-eddac4bd87da"
+import { Search, Plus, User, X } from 'lucide-react'
 
 export default function HomePage() {
   const router = useRouter()
@@ -72,15 +67,15 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#f4fbfd] flex flex-col">
       <div className="sticky top-0 z-50 flex items-center justify-between px-5 py-[14px] border-b border-[#d6dee8] bg-[#f4fbfd]">
         <Link href="/home" className="flex items-center gap-2">
-          <img src={imgFrame} alt="Cravi" className="w-7 h-7" />
+          <img src="/icon-192.png" alt="Cravi" className="w-7 h-7 rounded-md" />
           <span className="font-playfair font-bold text-[#3b6370] text-[19px]">Cravi</span>
         </Link>
         <div className="flex items-center gap-1">
           <button onClick={() => setShowModal(true)} className="w-9 h-9 flex items-center justify-center">
-            <img src={imgPlus} alt="Add" className="w-5 h-5" />
+            <Plus className="w-5 h-5 text-[#3b6370]" />
           </button>
           <Link href="/profile" className="w-9 h-9 flex items-center justify-center">
-            <img src={imgUser} alt="Profile" className="w-5 h-5" />
+            <User className="w-5 h-5 text-[#3b6370]" />
           </Link>
         </div>
       </div>
@@ -178,7 +173,7 @@ function AddRecipeModal({ onClose, onSaved }: { onClose: () => void, onSaved: ()
       })
       const data = await res.json()
       if (data.success) setResult(data.recipe)
-      else setError('Could not parse this URL. Please try another.')
+      else setError(data.error || 'Could not parse this URL. Please try another.')
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {
@@ -220,7 +215,7 @@ function AddRecipeModal({ onClose, onSaved }: { onClose: () => void, onSaved: ()
           <div className="flex items-center justify-between">
             <p className="font-inter font-semibold text-[#5c6365] text-[14px] uppercase tracking-wide">Recipe found</p>
             <button onClick={onClose} className="w-8 h-8 bg-[#dde4e6] rounded-full flex items-center justify-center flex-shrink-0">
-              <img src={imgCloseIcon} alt="Close" className="w-4 h-4" />
+              <X className="w-4 h-4 text-[#5c6365]" />
             </button>
           </div>
           <p className="font-playfair font-bold text-[#1a1a1a] text-[20px] leading-snug">{result.title}</p>
@@ -261,7 +256,7 @@ function AddRecipeModal({ onClose, onSaved }: { onClose: () => void, onSaved: ()
         <div className="flex items-center justify-between">
           <h3 className="font-playfair font-bold text-[#1a1a1a] text-xl">Add Recipe</h3>
           <button onClick={onClose} className="w-9 h-9 bg-[#dde4e6] rounded-full flex items-center justify-center">
-            <img src={imgCloseIcon} alt="Close" className="w-4 h-4" />
+            <X className="w-4 h-4 text-[#5c6365]" />
           </button>
         </div>
         <p className="font-inter text-[#5c6365] text-sm leading-relaxed">Paste a recipe URL from Instagram or TikTok and we'll automatically import it into your collection.</p>

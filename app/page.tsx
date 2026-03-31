@@ -3,9 +3,7 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-
-const imgLogo = "https://www.figma.com/api/mcp/asset/507d1621-5c04-49a2-becd-a113590c5e20"
-const imgEye = "https://www.figma.com/api/mcp/asset/4cf1cb22-f396-4a65-b6a3-fd5db2caf359"
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function AuthPage() {
   const router = useRouter()
@@ -51,7 +49,7 @@ export default function AuthPage() {
       <div className="flex flex-col items-center gap-6 w-full max-w-sm">
         {/* Logo + headline */}
         <div className="flex flex-col items-center gap-6 text-center">
-          <img src={imgLogo} alt="Cravi" className="w-[120px] h-[120px]" />
+          <img src="/icon-192.png" alt="Cravi" className="w-[120px] h-[120px] rounded-2xl" />
           <div className="flex flex-col gap-4">
             <p className="font-playfair font-bold text-[#1a1a1a] text-2xl">Welcome to Cravi!</p>
             <p className="font-inter text-[#5c6365] text-base leading-relaxed">
@@ -87,7 +85,10 @@ export default function AuthPage() {
                   className="flex-1 font-inter text-[15px] text-[#1a1a1a] placeholder-[#848a8c] outline-none bg-transparent"
                 />
                 <button onClick={() => setShowPassword(!showPassword)}>
-                  <img src={imgEye} alt="Toggle" className="w-5 h-5 opacity-50" />
+                  {showPassword
+                    ? <EyeOff className="w-5 h-5 text-[#848a8c]" />
+                    : <Eye className="w-5 h-5 text-[#848a8c]" />
+                  }
                 </button>
               </div>
               {error && <p className="font-inter text-[#dc2626] text-[11px] leading-relaxed">{error}</p>}

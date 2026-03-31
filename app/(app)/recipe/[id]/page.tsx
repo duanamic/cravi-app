@@ -4,13 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-
-const imgShare = "https://www.figma.com/api/mcp/asset/2e6072c7-5798-4baa-b5ad-1f5aa279739c"
-const imgFrame = "https://www.figma.com/api/mcp/asset/9c798a3a-59e0-433f-b570-663bce9e7812"
-const imgPlus = "https://www.figma.com/api/mcp/asset/10967774-ad84-40dc-9eb5-8a8972c209d9"
-const imgUser = "https://www.figma.com/api/mcp/asset/ff62e3c2-4b3e-474c-a5a7-dde74034b100"
-const imgSource = "https://www.figma.com/api/mcp/asset/dd32631d-3942-4ebb-9d86-901f9867e36f"
-const imgIgLinkIcon = "https://www.figma.com/api/mcp/asset/38904227-8d27-4c01-b20e-d0a84a341d81"
+import { Share2, Plus, User, ExternalLink } from 'lucide-react'
 
 export default function RecipeDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -118,15 +112,15 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
     <div className="min-h-screen bg-[#f4fbfd]">
       <div className="sticky top-0 z-50 flex items-center justify-between px-5 py-[14px] border-b border-[#d6dee8] bg-[#f4fbfd]">
         <Link href="/home" className="flex items-center gap-2">
-          <img src={imgFrame} alt="Cravi" className="w-7 h-7" />
+          <img src="/icon-192.png" alt="Cravi" className="w-7 h-7 rounded-md" />
           <span className="font-playfair font-bold text-[#3b6370] text-[19px]">Cravi</span>
         </Link>
         <div className="flex items-center gap-1">
           <button onClick={() => setShowModal(true)} className="w-9 h-9 flex items-center justify-center">
-            <img src={imgPlus} alt="Add" className="w-5 h-5" />
+            <Plus className="w-5 h-5 text-[#3b6370]" />
           </button>
           <Link href="/profile" className="w-9 h-9 flex items-center justify-center">
-            <img src={imgUser} alt="Profile" className="w-5 h-5" />
+            <User className="w-5 h-5 text-[#3b6370]" />
           </Link>
         </div>
       </div>
@@ -148,7 +142,7 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
               >
                 {copied
                   ? <span className="text-white text-[10px] font-inter font-semibold">Copied!</span>
-                  : <img src={imgShare} alt="Share" className="w-5 h-5" />
+                  : <Share2 className="w-5 h-5 text-white" />
                 }
               </button>
             </>
@@ -180,7 +174,7 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
           )}
           {!isEditing && recipe.source_url && (
             <a href={recipe.source_url} target="_blank" rel="noopener noreferrer" className="p-2 flex-shrink-0">
-              <img src={imgIgLinkIcon} alt="View original post" className="w-4 h-4" />
+              <ExternalLink className="w-4 h-4 text-[#5c6365]" />
             </a>
           )}
         </div>
@@ -188,7 +182,7 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
         {/* Source handle */}
         {!isEditing && recipe.source_handle && (
           <div className="flex items-center gap-2">
-            <img src={imgSource} alt="Source" className="w-4 h-4" />
+            <ExternalLink className="w-4 h-4 text-[#5c6365]" />
             <p className="font-inter text-[#5c6365] text-[13px]">Saved from {recipe.source_handle} on {recipe.platform === 'tiktok' ? 'TikTok' : 'Instagram'}</p>
           </div>
         )}
@@ -327,7 +321,7 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
             <div className="flex items-center justify-between">
               <h3 className="font-playfair font-bold text-[#1a1a1a] text-xl">Add Recipe</h3>
               <button onClick={() => setShowModal(false)} className="w-9 h-9 bg-[#dde4e6] rounded-full flex items-center justify-center">
-                <span className="text-[#5c6365] text-lg">×</span>
+                <X className="w-4 h-4 text-[#5c6365]" />
               </button>
             </div>
             <p className="font-inter text-[#5c6365] text-sm leading-relaxed">Paste a recipe URL from Instagram or TikTok to add it to your collection.</p>
