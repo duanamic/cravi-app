@@ -132,26 +132,33 @@ export default function HomePage() {
   )
 }
 
-const CUISINE_COLORS: Record<string, string> = {
-  'Italian': 'from-[#c0392b] to-[#e74c3c]',
-  'Mexican': 'from-[#e67e22] to-[#f39c12]',
-  'Mediterranean': 'from-[#2980b9] to-[#3498db]',
-  'Indonesian': 'from-[#8e44ad] to-[#9b59b6]',
-  'Moroccan': 'from-[#d35400] to-[#e67e22]',
-  'Middle Eastern': 'from-[#c0392b] to-[#e67e22]',
-  'Japanese': 'from-[#2c3e50] to-[#34495e]',
-  'Indian': 'from-[#f39c12] to-[#e74c3c]',
-  'Thai': 'from-[#27ae60] to-[#f39c12]',
-  'Chinese': 'from-[#c0392b] to-[#f39c12]',
-  'Korean': 'from-[#e74c3c] to-[#2c3e50]',
-  'French': 'from-[#2c3e50] to-[#2980b9]',
-  'Fusion': 'from-[#8e44ad] to-[#2980b9]',
+const CUISINE_STYLES: Record<string, { gradient: string; emoji: string }> = {
+  'Italian': { gradient: 'from-[#c0392b] to-[#e74c3c]', emoji: '🍝' },
+  'Mexican': { gradient: 'from-[#e67e22] to-[#f39c12]', emoji: '🌮' },
+  'Mediterranean': { gradient: 'from-[#2980b9] to-[#3498db]', emoji: '🫒' },
+  'Indonesian': { gradient: 'from-[#8e44ad] to-[#9b59b6]', emoji: '🍜' },
+  'Moroccan': { gradient: 'from-[#d35400] to-[#e67e22]', emoji: '🫖' },
+  'Middle Eastern': { gradient: 'from-[#c0392b] to-[#e67e22]', emoji: '🧆' },
+  'Middle Eastern fusion': { gradient: 'from-[#c0392b] to-[#e67e22]', emoji: '🧆' },
+  'Japanese': { gradient: 'from-[#2c3e50] to-[#34495e]', emoji: '🍣' },
+  'Indian': { gradient: 'from-[#f39c12] to-[#e74c3c]', emoji: '🍛' },
+  'North Indian': { gradient: 'from-[#f39c12] to-[#e74c3c]', emoji: '🍛' },
+  'Punjabi': { gradient: 'from-[#f39c12] to-[#e74c3c]', emoji: '🍛' },
+  'Thai': { gradient: 'from-[#27ae60] to-[#f39c12]', emoji: '🍜' },
+  'Chinese': { gradient: 'from-[#c0392b] to-[#f39c12]', emoji: '🥡' },
+  'Korean': { gradient: 'from-[#e74c3c] to-[#2c3e50]', emoji: '🍲' },
+  'French': { gradient: 'from-[#2c3e50] to-[#2980b9]', emoji: '🥐' },
+  'American': { gradient: 'from-[#e74c3c] to-[#3498db]', emoji: '🍔' },
+  'British': { gradient: 'from-[#2c3e50] to-[#7f8c8d]', emoji: '🫖' },
+  'Cajun': { gradient: 'from-[#e74c3c] to-[#d35400]', emoji: '🦐' },
+  'Fusion': { gradient: 'from-[#8e44ad] to-[#2980b9]', emoji: '🍽️' },
+  'International': { gradient: 'from-[#3b6370] to-[#5a8a8a]', emoji: '🌍' },
 }
-const DEFAULT_GRADIENT = 'from-[#3b6370] to-[#5a8a8a]'
+const DEFAULT_STYLE = { gradient: 'from-[#3b6370] to-[#5a8a8a]', emoji: '🍴' }
 
 function RecipeCard({ recipe }: { recipe: any }) {
   const cuisine = recipe.tags?.cuisine || ''
-  const gradient = CUISINE_COLORS[cuisine] || DEFAULT_GRADIENT
+  const { gradient, emoji } = CUISINE_STYLES[cuisine] || DEFAULT_STYLE
   return (
     <Link href={`/recipe/${recipe.id}`}>
       <div className="bg-white rounded-xl overflow-hidden shadow-sm">
@@ -161,8 +168,8 @@ function RecipeCard({ recipe }: { recipe: any }) {
               className="absolute inset-0 w-full h-full object-cover"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
           )}
-          <div className="absolute inset-0 flex items-center justify-center p-3">
-            <span className="font-playfair font-semibold text-white/90 text-[13px] leading-tight line-clamp-3 text-center">{recipe.title}</span>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-[48px] drop-shadow-lg">{emoji}</span>
           </div>
         </div>
         <div className="p-3 flex flex-col gap-2">
