@@ -126,7 +126,13 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
       </div>
 
       <div className="relative w-full h-[240px] bg-[#3b6370] flex items-center justify-center px-10">
-        <p className="font-playfair font-bold text-white text-2xl text-center leading-snug">{recipe.title}</p>
+        {recipe.image_url && (
+          <>
+            <img src={recipe.image_url} alt={recipe.title} className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/40" />
+          </>
+        )}
+        <p className="font-playfair font-bold text-white text-2xl text-center leading-snug relative z-10">{recipe.title}</p>
         <div className="absolute top-4 right-4 flex gap-2">
           {!isEditing ? (
             <>

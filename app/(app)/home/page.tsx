@@ -132,16 +132,38 @@ export default function HomePage() {
   )
 }
 
+const CUISINE_COLORS: Record<string, string> = {
+  'Italian': 'from-[#c0392b] to-[#e74c3c]',
+  'Mexican': 'from-[#e67e22] to-[#f39c12]',
+  'Mediterranean': 'from-[#2980b9] to-[#3498db]',
+  'Indonesian': 'from-[#8e44ad] to-[#9b59b6]',
+  'Moroccan': 'from-[#d35400] to-[#e67e22]',
+  'Middle Eastern': 'from-[#c0392b] to-[#e67e22]',
+  'Japanese': 'from-[#2c3e50] to-[#34495e]',
+  'Indian': 'from-[#f39c12] to-[#e74c3c]',
+  'Thai': 'from-[#27ae60] to-[#f39c12]',
+  'Chinese': 'from-[#c0392b] to-[#f39c12]',
+  'Korean': 'from-[#e74c3c] to-[#2c3e50]',
+  'French': 'from-[#2c3e50] to-[#2980b9]',
+  'Fusion': 'from-[#8e44ad] to-[#2980b9]',
+}
+const DEFAULT_GRADIENT = 'from-[#3b6370] to-[#5a8a8a]'
+
 function RecipeCard({ recipe }: { recipe: any }) {
   const cuisine = recipe.tags?.cuisine || ''
+  const gradient = CUISINE_COLORS[cuisine] || DEFAULT_GRADIENT
   return (
     <Link href={`/recipe/${recipe.id}`}>
       <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-        <div className="w-full h-[150px] bg-[#dde4e6] flex items-center justify-center p-3">
-          <span className="font-inter text-[#5c6365] text-xs text-center leading-relaxed">{recipe.title}</span>
-        </div>
+        {recipe.image_url ? (
+          <img src={recipe.image_url} alt={recipe.title} className="w-full h-[150px] object-cover" />
+        ) : (
+          <div className={`w-full h-[150px] bg-gradient-to-br ${gradient} flex items-end p-3`}>
+            <span className="font-playfair font-semibold text-white/90 text-[13px] leading-tight line-clamp-2">{recipe.title}</span>
+          </div>
+        )}
         <div className="p-3 flex flex-col gap-2">
-          <p className="font-playfair font-semibold text-[#1a1a1a] text-base leading-tight">{recipe.title}</p>
+          <p className="font-playfair font-semibold text-[#1a1a1a] text-base leading-tight line-clamp-2">{recipe.title}</p>
           <div className="flex items-center gap-1.5">
             {cuisine && <span className="bg-[#3b6370] text-white text-[10px] font-inter font-medium px-2 py-[3px] rounded-[10px]">{cuisine}</span>}
             {recipe.prep_time && <span className="font-inter text-[#6b6560] text-[11px]">{recipe.prep_time}</span>}

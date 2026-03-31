@@ -35,7 +35,22 @@ function isValidRecipeUrl(url: string): boolean {
   }
 }
 
-async function fetchPostMeta(url: string): Promise<{ caption: string }> {
+async function fetchPostMeta(url: string): Promise<{ caption: string; imageUrl: string }> {
+  // TikTok: use oEmbed API (returns real thumbnail + title, no auth needed)
+  if (url.includes('tiktok.com')) {
+    try {
+      const oembedRes = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(url)}`)
+      if (oembedRes.ok) {
+        const data = await oembedRes.json()
+        return {
+          caption: data.title || '',
+          imageUrl: data.thumbnail_url || '',
+        }
+      }
+    } catch { /* fall through to HTML scraping */ }
+  }
+
+  // Instagram / fallback: scrape HTML meta tags
   try {
     const res = await fetch(url, {
       headers: {
@@ -46,11 +61,13 @@ async function fetchPostMeta(url: string): Promise<{ caption: string }> {
     const html = await res.text()
     const captionMatch = html.match(/<meta property="og:description" content="([^"]+)"/)
     const captionMatch2 = html.match(/<meta name="twitter:description" content="([^"]+)"/)
+    const imageMatch = html.match(/<meta property="og:image" content="([^"]+)"/)
     return {
       caption: captionMatch?.[1] || captionMatch2?.[1] || '',
+      imageUrl: imageMatch?.[1] || '',
     }
   } catch {
-    return { caption: '' }
+    return { caption: '', imageUrl: '' }
   }
 }
 
@@ -82,7 +99,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { caption } = await fetchPostMeta(url)
+    const { caption, imageUrl } = await fetchPostMeta(url)
 
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
@@ -118,6 +135,7 @@ Based on the caption and URL, extract or create a realistic recipe. Return ONLY 
     if (content.type !== 'text') throw new Error('Unexpected response type')
     const clean = content.text.replace(/```json|```/g, '').trim()
     const recipe = JSON.parse(clean)
+    if (imageUrl) recipe.image_url = imageUrl
     return NextResponse.json({ success: true, recipe })
   } catch (error: any) {
     console.error('Recipe parsing error:', error)
