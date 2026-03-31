@@ -61,7 +61,35 @@ export default function HomePage() {
   const col1 = filteredRecipes.filter((_, i) => i % 2 === 0)
   const col2 = filteredRecipes.filter((_, i) => i % 2 === 1)
 
-  if (loading) return null
+  if (loading) return (
+    <div className="min-h-screen bg-[#f4fbfd] flex flex-col">
+      <div className="sticky top-0 z-50 flex items-center justify-between px-5 py-[14px] border-b border-[#d6dee8] bg-[#f4fbfd]">
+        <div className="flex items-center gap-2">
+          <img src="/icon-192.png" alt="Cravi" className="w-7 h-7 rounded-md" />
+          <span className="font-playfair font-bold text-[#3b6370] text-[19px]">Cravi</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-9 h-9" />
+          <div className="w-9 h-9" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-6 px-5 py-6 flex-1 animate-pulse">
+        <div className="h-8 bg-[#dde4e6] rounded-lg w-3/4" />
+        <div className="h-[44px] bg-[#dde4e6] rounded-xl w-full" />
+        <div className="flex gap-2">
+          {[1,2,3,4].map(i => <div key={i} className="h-10 bg-[#dde4e6] rounded-full w-20 flex-shrink-0" />)}
+        </div>
+        <div className="flex gap-3">
+          <div className="flex-1 flex flex-col gap-3">
+            {[1,2,3].map(i => <div key={i} className="bg-[#dde4e6] rounded-xl h-[220px]" />)}
+          </div>
+          <div className="flex-1 flex flex-col gap-3">
+            {[1,2,3].map(i => <div key={i} className="bg-[#dde4e6] rounded-xl h-[220px]" />)}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-[#f4fbfd] flex flex-col">
@@ -162,15 +190,17 @@ function RecipeCard({ recipe }: { recipe: any }) {
   return (
     <Link href={`/recipe/${recipe.id}`}>
       <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-        {recipe.image_url ? (
-          <img src={recipe.image_url.replace(/&amp;/g, '&')} alt={recipe.title}
-            className="w-full h-[150px] object-cover"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
-        ) : (
-          <div className={`w-full h-[150px] bg-gradient-to-br ${gradient} flex items-center justify-center`}>
-            <span className="text-[48px] drop-shadow-lg">{emoji}</span>
-          </div>
-        )}
+        <div className={`w-full h-[150px] bg-gradient-to-br ${gradient} relative`}>
+          {recipe.image_url ? (
+            <img src={recipe.image_url.replace(/&amp;/g, '&')} alt={recipe.title}
+              className="w-full h-full object-cover"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-[48px] drop-shadow-lg">{emoji}</span>
+            </div>
+          )}
+        </div>
         <div className="p-3 flex flex-col gap-2">
           <p className="font-playfair font-semibold text-[#1a1a1a] text-base leading-tight line-clamp-2">{recipe.title}</p>
           <div className="flex items-center gap-1.5">

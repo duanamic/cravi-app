@@ -100,7 +100,43 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
     setSaving(false)
   }
 
-  if (loading || !recipe) return null
+  if (loading || !recipe) return (
+    <div className="min-h-screen bg-[#f4fbfd]">
+      <div className="sticky top-0 z-50 flex items-center justify-between px-5 py-[14px] border-b border-[#d6dee8] bg-[#f4fbfd]">
+        <div className="flex items-center gap-2">
+          <img src="/icon-192.png" alt="Cravi" className="w-7 h-7 rounded-md" />
+          <span className="font-playfair font-bold text-[#3b6370] text-[19px]">Cravi</span>
+        </div>
+      </div>
+      <div className="animate-pulse">
+        <div className="w-full h-[240px] bg-[#3b6370]" />
+        <div className="bg-white rounded-t-3xl -mt-6 relative px-6 pt-8 pb-24 flex flex-col gap-5">
+          <div className="w-10 h-1 bg-[#d4d4d4] rounded-full mx-auto" />
+          <div className="h-8 bg-[#dde4e6] rounded-lg w-3/4" />
+          <div className="h-4 bg-[#dde4e6] rounded w-1/2" />
+          <div className="flex gap-2">
+            <div className="h-7 bg-[#dde4e6] rounded-full w-24" />
+            <div className="h-7 bg-[#dde4e6] rounded-full w-20" />
+          </div>
+          <div className="h-px bg-[#dde4e6]" />
+          <div className="flex flex-col gap-3">
+            <div className="h-3 bg-[#dde4e6] rounded w-24" />
+            {[1,2,3,4,5].map(i => <div key={i} className="h-4 bg-[#dde4e6] rounded w-full" />)}
+          </div>
+          <div className="h-px bg-[#dde4e6]" />
+          <div className="flex flex-col gap-4">
+            <div className="h-3 bg-[#dde4e6] rounded w-16" />
+            {[1,2,3].map(i => (
+              <div key={i} className="flex gap-4 items-start">
+                <div className="w-7 h-7 bg-[#dde4e6] rounded-xl flex-shrink-0" />
+                <div className="h-4 bg-[#dde4e6] rounded flex-1" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 
   const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : []
   const steps = Array.isArray(recipe.steps) ? recipe.steps : []
