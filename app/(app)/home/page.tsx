@@ -155,13 +155,16 @@ function RecipeCard({ recipe }: { recipe: any }) {
   return (
     <Link href={`/recipe/${recipe.id}`}>
       <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-        {recipe.image_url ? (
-          <img src={recipe.image_url} alt={recipe.title} className="w-full h-[150px] object-cover" />
-        ) : (
-          <div className={`w-full h-[150px] bg-gradient-to-br ${gradient} flex items-center justify-center p-3`}>
+        <div className={`w-full h-[150px] bg-gradient-to-br ${gradient} relative overflow-hidden`}>
+          {recipe.image_url && (
+            <img src={recipe.image_url.replace(/&amp;/g, '&')} alt={recipe.title}
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+          )}
+          <div className="absolute inset-0 flex items-center justify-center p-3">
             <span className="font-playfair font-semibold text-white/90 text-[13px] leading-tight line-clamp-3 text-center">{recipe.title}</span>
           </div>
-        )}
+        </div>
         <div className="p-3 flex flex-col gap-2">
           <p className="font-playfair font-semibold text-[#1a1a1a] text-base leading-tight line-clamp-2">{recipe.title}</p>
           <div className="flex items-center gap-1.5">

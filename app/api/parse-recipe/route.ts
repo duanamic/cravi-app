@@ -62,9 +62,10 @@ async function fetchPostMeta(url: string): Promise<{ caption: string; imageUrl: 
     const captionMatch = html.match(/<meta property="og:description" content="([^"]+)"/)
     const captionMatch2 = html.match(/<meta name="twitter:description" content="([^"]+)"/)
     const imageMatch = html.match(/<meta property="og:image" content="([^"]+)"/)
+    const rawImageUrl = imageMatch?.[1] || ''
     return {
       caption: captionMatch?.[1] || captionMatch2?.[1] || '',
-      imageUrl: imageMatch?.[1] || '',
+      imageUrl: rawImageUrl.replace(/&amp;/g, '&'),
     }
   } catch {
     return { caption: '', imageUrl: '' }

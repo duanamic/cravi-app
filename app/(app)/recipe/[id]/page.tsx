@@ -128,7 +128,9 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
       <div className="relative w-full h-[240px] bg-[#3b6370] flex items-center justify-center px-10">
         {recipe.image_url && (
           <>
-            <img src={recipe.image_url} alt={recipe.title} className="absolute inset-0 w-full h-full object-cover" />
+            <img src={recipe.image_url.replace(/&amp;/g, '&')} alt={recipe.title}
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
             <div className="absolute inset-0 bg-black/40" />
           </>
         )}
